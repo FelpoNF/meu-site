@@ -6,6 +6,9 @@
 <title>Byline Studio | Digital products for creators</title>
 <meta name="description" content="We write, design and produce custom digital products from your content, in your tone, for your followers. You only have to sell it.">
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#F2F4F7">
 
 <!-- Open Graph: what shows up when the link is shared in an email, a DM or a post. -->
@@ -22,7 +25,7 @@
 <meta name="twitter:description" content="We turn what you've already published into a product your followers want to buy.">
 <meta name="twitter:image" content="og-image.png">
 
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@800&display=swap" rel="stylesheet">
@@ -358,7 +361,8 @@ footer.site a:hover{text-decoration:underline;text-underline-offset:4px}
         <p class="lead">We write, design and produce custom digital products from your content, in your tone, for your followers. You only have to sell it.</p>
         <div class="cta-row">
           <a class="btn" data-cta href="#next">Pick a 30-minute slot <span class="arw" aria-hidden="true">→</span></a>
-          <a class="btn wpp" data-wa href="#" target="_blank" rel="noopener">
+          <a class="btn ghost" data-wa-fallback href="#formats">See what we make</a>
+          <a class="btn wpp" data-wa href="#" target="_blank" rel="noopener" hidden>
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.35-.53.05-1.03.24-3.47-.72-2.94-1.16-4.8-4.2-4.94-4.4-.14-.19-1.17-1.56-1.17-2.98 0-1.41.74-2.11 1-2.4.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.18.01.42-.07.66.5.24.58.82 2 .89 2.14.07.14.12.31.02.5-.1.19-.15.31-.29.48-.15.17-.31.38-.44.51-.15.14-.3.3-.13.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.29 2.33 1.44.29.14.46.12.63-.07.17-.19.72-.84.91-1.13.19-.29.38-.24.64-.14.26.09 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36Z"/></svg>
             Message us on WhatsApp
           </a>
@@ -630,9 +634,12 @@ const niche  = (params.get("niche") || "").trim().toLowerCase();
 /* ===== WhatsApp button: hidden until a number is set ===== */
 document.querySelectorAll("[data-wa]").forEach(el => {
   const digits = (WHATSAPP || "").replace(/\D/g, "");
-  if (!digits) { el.hidden = true; el.style.display = "none"; return; }
+  if (!digits) return;                       // no number yet: the ghost link stays
   const text = encodeURIComponent("Hi " + BRAND + " — I'd like to talk about a product for my audience.");
   el.href = "https://wa.me/" + digits + "?text=" + text;
+  el.hidden = false;
+  el.style.display = "";
+  document.querySelectorAll("[data-wa-fallback]").forEach(f => { f.hidden = true; f.style.display = "none"; });
 });
 
 document.querySelectorAll("[data-brand]").forEach(el => el.textContent = BRAND);
