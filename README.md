@@ -22,6 +22,7 @@ No topo do `<script>` de `index.html`:
 ```js
 const BRAND        = "Byline Studio";
 const EMAIL        = "studiobyline@gmail.com";
+const WHATSAPP     = "";   // só dígitos com DDI, ex. "5511999999999" — vazio = botão do hero escondido
 const CALENDLY_URL = "";   // ← cole seu link do Calendly aqui
 ```
 
