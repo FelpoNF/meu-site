@@ -120,6 +120,7 @@ h2{font-size:clamp(1.95rem,4vw,3.05rem);max-width:22ch}
 .hero h1{font-size:clamp(2.89rem,6.47vw,5.43rem);letter-spacing:-.045em;line-height:1.02;max-width:15ch}
 .hero .lead{margin-top:26px;font-size:1.28rem;max-width:50ch}
 .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;align-items:center}
+.cta-note{margin-top:14px;font-size:.95rem;color:var(--muted)}
 .btn.wpp{background:#25D366;border-color:#25D366;color:#05301A;gap:9px}
 .btn.wpp svg{width:20px;height:20px;flex:none}
 .btn.wpp:hover{background:#12A855;border-color:#12A855;color:#fff}
@@ -367,6 +368,7 @@ footer.site a:hover{text-decoration:underline;text-underline-offset:4px}
             Message us on WhatsApp
           </a>
         </div>
+        <p class="cta-note">Partnerships team, Byline Studio</p>
       </div>
       <div class="stack" aria-hidden="true">
         <div class="sbook" style="--w:228px;--x:32px;--c:#F2B134;--t:#101B33;--d:5">Deep Focus</div>
@@ -573,7 +575,7 @@ footer.site a:hover{text-decoration:underline;text-underline-offset:4px}
 const BRAND        = "Byline Studio";        // shows in nav, footer, email subject
 const EMAIL        = "studiobyline@gmail.com"; // where replies land
 const CALENDLY_URL = "";                       // e.g. "https://calendly.com/bylineeditions/20min"
-const WHATSAPP     = "";                       // digits only with country code, e.g. "5511999999999"
+const WHATSAPP     = "5531991022756";           // Brazil, +55 31 99102-2756
                                                // leave empty and every CTA falls back to the email
 
 /* =========================================================================
@@ -635,7 +637,7 @@ const niche  = (params.get("niche") || "").trim().toLowerCase();
 document.querySelectorAll("[data-wa]").forEach(el => {
   const digits = (WHATSAPP || "").replace(/\D/g, "");
   if (!digits) return;                       // no number yet: the ghost link stays
-  const text = encodeURIComponent("Hi " + BRAND + " — I'd like to talk about a product for my audience.");
+  const text = encodeURIComponent("Hi " + BRAND + ", I'd like to talk about the partnership and what product you would build for my audience. My channel: ");
   el.href = "https://wa.me/" + digits + "?text=" + text;
   el.hidden = false;
   el.style.display = "";
