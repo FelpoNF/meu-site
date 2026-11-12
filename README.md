@@ -9,7 +9,8 @@ Página única do estúdio que produz produtos digitais sob medida a partir do c
 | `index.html` | a página inteira (CSS e JS embutidos, sem build, sem dependências) |
 | `privacy.html` | política de privacidade em linguagem simples |
 | `og-image.png` | 1200×630 — o cartão que aparece quando alguém compartilha o link |
-| `favicon.svg` | ícone da aba |
+| `favicon.svg` | ícone da aba (os cinco livros, fundo transparente, 675 bytes) |
+| `apple-touch-icon.png` | 180×180 — ícone do atalho na tela inicial do iPhone (iOS ignora transparência, por isso tem fundo `#F2F4F7`) |
 | `preview-desktop.png` / `preview-mobile.png` | primeira tela em 1440×900 e 500×800 (não precisam ir para o servidor) |
 | `preview-finale.png` | a seção amarela com o calendário, 1440×520 |
 
