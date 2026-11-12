@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Byline Studio | Digital products for creators</title>
+<meta name="description" content="We write, design and produce custom digital products from your content, in your tone, for your followers. You only have to sell it.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F2F4F7">
+
+<!-- Open Graph: what shows up when the link is shared in an email, a DM or a post. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Byline Studio">
+<meta property="og:title" content="The digital product only you could make.">
+<meta property="og:description" content="Written, designed and produced from your own content, in your own voice. Your name on it, our work behind it.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The digital product only you could make.">
+<meta name="twitter:description" content="We turn what you've already published into a product your followers want to buy.">
+<meta name="twitter:image" content="og-image.png">
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#F2F4F7;
+  --white:#FFFFFF;
+  --ink:#101B33;
+  --muted:#58627A;
+  --line:#D3D9E3;
+  --saffron:#F2B134;
+  --cobalt:#2B4EFF;
+  --tomato:#D43D28;
+  --forest:#1F6B4F;
+  --plum:#6B2D5C;
+  --sky:#8EC5E8;
+  --display:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --s:1;
+  --sh:1;
+  --ease:cubic-bezier(.22,.85,.24,1);
+}
+@media (max-width:560px){:root{--s:.74;--sh:.86}}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:1.125rem;line-height:1.62;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.03em;line-height:1.06;font-weight:800}
+p{margin:0;text-wrap:pretty}
+h1,h2,h3{text-wrap:balance}
+a{color:inherit}
+img,svg{display:block;max-width:100%}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px;border-radius:4px}
+.dark :focus-visible{outline-color:var(--saffron)}
+.finale :focus-visible{outline-color:var(--ink)}
+
+.wrap{width:100%;max-width:1140px;margin:0 auto;padding-inline:24px}
+section{padding-block:104px}
+@media (max-width:760px){section{padding-block:72px}}
+
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:#fff;padding:12px 18px;z-index:99;font-family:var(--display)}
+.skip:focus{left:12px;top:12px}
+
+/* ---------- type ---------- */
+h2{font-size:clamp(1.95rem,4vw,3.05rem);max-width:22ch}
+.lead{font-size:1.22rem;max-width:54ch;color:var(--muted);margin-top:20px}
+.dark .lead{color:rgba(255,255,255,.72)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.02rem;padding:15px 28px;border-radius:999px;border:2px solid var(--ink);background:var(--ink);color:var(--white);text-decoration:none;cursor:pointer;transition:transform .18s var(--ease),background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.btn:hover{transform:translateY(-2px);background:var(--cobalt);border-color:var(--cobalt);box-shadow:0 14px 26px -16px rgba(16,27,51,.7)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.btn.small{padding:12px 23px;font-size:1.02rem}
+.btn .arw{transition:transform .2s var(--ease)}
+.btn[hidden]{display:none}
+.btn:hover .arw{transform:translateX(3px)}
+
+/* ---------- nav ---------- */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s ease}
+.top.stuck{border-bottom-color:var(--line)}
+.nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-block:22px;gap:20px}
+.nav .brand{justify-self:start}
+.nav-links{justify-self:center}
+.nav-cta{justify-self:end;white-space:nowrap}
+@media (max-width:860px){.nav{display:flex;justify-content:space-between}}
+.brand{display:inline-flex;align-items:baseline;gap:.31em;text-decoration:none;white-space:nowrap;
+  font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:800;font-size:1.9rem;letter-spacing:-.035em;line-height:1}
+.brand-mark{height:1.14em;width:auto;display:block;flex:none}
+.brand-mark path{transform-box:fill-box;transform-origin:bottom center;transition:transform .14s ease-out}
+.brand .bw-by{color:#1B2A4A}
+.brand .bw-st{color:#2F5BEA}
+::selection{background:var(--saffron);color:var(--ink)}
+.nav-links{display:flex;align-items:center;gap:34px;font-family:var(--display);font-weight:500;font-size:1.06rem}
+.nav-links a:not(.btn){text-decoration:none;position:relative}
+.nav-links a:not(.btn):hover{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
+@media (max-width:760px){.nav-links a:not(.btn){display:none}}
+@media (max-width:430px){
+  .brand{font-size:1.44rem}
+  .btn.small{padding:10px 15px;font-size:.85rem}
+  .nav{padding-block:14px}
+  .wrap{padding-inline:18px}
+  .cta-row{flex-direction:column;align-items:stretch}
+  .cta-row .btn{width:100%}
+}
+
+/* ---------- hero ---------- */
+.hero{padding-block:48px;display:flex;align-items:center;min-height:90vh;min-height:90svh}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(296px,.72fr);gap:32px;align-items:center}
+@media (max-width:960px){.hero-grid{grid-template-columns:1fr;gap:36px}}
+.hero h1{font-size:clamp(2.89rem,6.47vw,5.43rem);letter-spacing:-.045em;line-height:1.02;max-width:15ch}
+.hero .lead{margin-top:26px;font-size:1.28rem;max-width:50ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;align-items:center}
+
+@media (max-width:760px){
+  .hero h1{max-width:100%}
+  h2{max-width:100%}
+}
+
+/* book stack (kept on mobile) */
+.stack{display:flex;flex-direction:column;align-items:flex-start;gap:3px;justify-self:end;width:max-content;max-width:100%;border-bottom:9px solid var(--ink);border-radius:0 0 3px 3px;padding-bottom:0}
+@media (max-width:960px){.stack{justify-self:center;margin-top:8px}}
+.sbook{position:relative;height:46px;width:var(--w);margin-left:var(--x);padding-left:18px;display:flex;align-items:center;background:var(--c);color:var(--t);border-radius:5px 3px 3px 5px;font-family:var(--display);font-weight:700;font-size:.94rem;letter-spacing:-.012em;box-shadow:inset 7px 0 0 rgba(255,255,255,.15);animation:drop .9s var(--ease) backwards;animation-delay:calc(var(--d)*90ms + 260ms)}
+.sbook::after{content:"";position:absolute;right:0;top:5px;bottom:5px;width:15px;background:repeating-linear-gradient(0deg,#fff 0 2px,#DDE2EB 2px 3px);border-radius:0 2px 2px 0;opacity:.92}
+@media (max-width:430px){.sbook{height:40px;font-size:.86rem;width:calc(var(--w)*.88);margin-left:calc(var(--x)*.7)}}
+@keyframes drop{from{transform:translateY(-80px);opacity:0}}
+
+/* ---------- short version ---------- */
+.short{background:var(--white);border-block:1px solid var(--line)}
+.short-head{max-width:38ch}
+.rows{margin:54px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:0;counter-reset:r}
+.rows li{counter-increment:r;padding:24px 34px 0 0;border-top:3px solid var(--cobalt)}
+.rows li+li{padding-left:34px}
+.rows li:nth-child(2){border-top-color:var(--saffron)}
+.rows li:nth-child(3){border-top-color:var(--tomato)}
+@media (max-width:900px){
+  .rows{grid-template-columns:1fr;margin-top:34px}
+  .rows li{padding:22px 0 0;border-top-width:1px}
+  .rows li+li{padding-left:0;margin-top:22px}
+}
+.rows li::before{content:counter(r,decimal-leading-zero);display:block;font-family:var(--display);font-weight:700;font-size:.8rem;letter-spacing:.1em;color:var(--muted);margin-bottom:14px}
+.rows b{display:block;font-family:var(--display);font-size:1.24rem;font-weight:700;letter-spacing:-.028em;line-height:1.22;margin-bottom:8px;text-wrap:balance}
+.rows p{color:var(--muted);font-size:1.02rem}
+
+/* ---------- shelf ---------- */
+.showcase{padding-top:96px;padding-bottom:104px}
+.showcase-head{max-width:62ch;margin-bottom:52px}
+.showcase-head .lead{margin-top:18px;font-size:1.08rem;max-width:56ch}
+@media (max-width:760px){.showcase-head{margin-bottom:34px}}
+.showcase-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);gap:56px;align-items:start}
+@media (max-width:900px){.showcase-grid{grid-template-columns:1fr;gap:44px}}
+
+.shelf{overflow-x:auto;overflow-y:hidden;padding-top:40px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.shelf::-webkit-scrollbar{display:none}
+.spines{display:flex;align-items:flex-end;gap:6px;padding-inline:6px;width:max-content;border-bottom:16px solid var(--ink);border-radius:0 0 2px 2px;box-shadow:0 16px 22px -14px rgba(16,27,51,.6)}
+
+.spine{--w:64;--h:300;position:relative;flex:none;width:calc(var(--w)*1px*var(--s));height:calc(var(--h)*1px*var(--sh));padding:14px 0;border:0;border-radius:3px 3px 0 0;background:var(--c);color:var(--t);display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;font-family:var(--display);transition:transform .3s var(--ease),box-shadow .3s ease;animation:place .75s var(--ease) backwards;animation-delay:calc(var(--i)*70ms);box-shadow:inset 3px 0 0 rgba(255,255,255,.18),inset -3px 0 0 rgba(0,0,0,.16)}
+.spine::before,.spine::after{content:"";display:block;width:56%;height:5px;background:currentColor;opacity:.42;border-radius:1px;flex:none}
+.spine::after{height:12px;width:12px;border-radius:50%}
+.spine span{writing-mode:vertical-rl;font-weight:700;font-size:1.02rem;letter-spacing:-.012em;white-space:nowrap;overflow:hidden}
+@media (max-width:560px){.spine span{font-size:.86rem}}
+.spine:hover{transform:translateY(-12px)}
+.spine[aria-pressed="true"]{transform:translateY(-24px);box-shadow:inset 3px 0 0 rgba(255,255,255,.18),inset -3px 0 0 rgba(0,0,0,.16),0 20px 24px -16px rgba(16,27,51,.6)}
+@keyframes place{from{transform:translateY(64px);opacity:0}}
+
+/* panel */
+.panel{display:flex;flex-wrap:wrap;gap:30px;align-items:flex-start;transition:opacity .18s ease,transform .18s ease;min-height:330px}
+.panel.swap{opacity:0;transform:translateY(6px)}
+.cover{position:relative;flex:none;width:172px;aspect-ratio:2/3;padding:20px 16px 16px 24px;border-radius:3px 8px 8px 3px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;box-shadow:0 28px 36px -22px rgba(16,27,51,.75)}
+.cover::before{content:"";position:absolute;inset:0 auto 0 0;width:9px;background:linear-gradient(90deg,rgba(0,0,0,.24),rgba(255,255,255,.14))}
+.cover b{position:relative;font-family:var(--display);font-weight:800;font-size:1.55rem;line-height:1.02;letter-spacing:-.04em}
+.cover small{position:relative;font-family:var(--display);font-weight:500;font-size:.78rem;opacity:.88;letter-spacing:.01em}
+.detail{flex:1 1 250px;min-width:0}
+.detail h3{font-size:1.85rem;font-weight:800;margin-top:0;letter-spacing:-.035em}
+.sub{font-style:italic;color:var(--muted);margin-top:2px}
+.detail .desc{margin-top:14px;max-width:44ch;font-size:1.04rem}
+.facts{margin:20px 0 0;padding:0;display:grid;gap:0;list-style:none}
+.facts li{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line);font-size:.97rem}
+.facts b{font-family:var(--display);font-weight:600;color:var(--muted);font-size:.86rem;letter-spacing:.04em;text-transform:uppercase;padding-top:.2em}
+.sample-note{margin-top:18px;font-size:.92rem;color:var(--muted);font-style:italic}
+
+/* ---------- process ---------- */
+.steps{list-style:none;margin:56px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:0;counter-reset:s}
+@media (max-width:1100px){.steps{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.steps{grid-template-columns:1fr}}
+.steps li{counter-increment:s;position:relative;display:flex;flex-direction:column;padding:26px 0 0;border-top:3px solid var(--ink);min-width:0}
+.steps li+li{padding-left:26px}
+@media (max-width:1100px){.steps li:nth-child(3){padding-left:0}.steps li:nth-child(3),.steps li:nth-child(4){border-top-width:3px;margin-top:34px}}
+@media (max-width:600px){.steps li+li{padding-left:0;border-top-width:1px;margin-top:26px}}
+.steps li::before{content:"0" counter(s);display:block;font-family:var(--display);font-weight:700;font-size:.8rem;letter-spacing:.1em;color:var(--cobalt);margin-bottom:14px}
+.steps h3{font-size:1.24rem;font-weight:700;margin-bottom:8px;letter-spacing:-.028em}
+.steps p{font-size:1.02rem;color:var(--muted)}
+.your{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:baseline;gap:8px;font-family:var(--display);font-size:.84rem;letter-spacing:.03em;color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--white);white-space:nowrap}
+.steps p{margin-bottom:20px}
+.your b{font-weight:700;text-transform:uppercase;font-size:.72rem;letter-spacing:.1em;color:var(--muted)}
+
+/* ---------- dark split ---------- */
+.dark{background:var(--ink);color:var(--white)}
+.split{display:grid;grid-template-columns:1.15fr 1fr;gap:64px;align-items:start;margin-top:46px}
+@media (max-width:900px){.split{grid-template-columns:1fr;gap:44px;margin-top:34px}}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.checks li{padding:13px 0 13px 34px;border-top:1px solid rgba(255,255,255,.16);position:relative;font-size:1.06rem;color:rgba(255,255,255,.9)}
+.checks li:last-child{border-bottom:1px solid rgba(255,255,255,.16)}
+.checks li::before{content:"";position:absolute;left:4px;top:20px;width:14px;height:8px;border-left:3px solid var(--saffron);border-bottom:3px solid var(--saffron);transform:rotate(-45deg)}
+.you{background:var(--saffron);color:var(--ink);border-radius:12px;padding:40px 34px}
+.you h3{font-size:clamp(1.5rem,2.6vw,1.95rem);letter-spacing:-.035em;line-height:1.1;max-width:18ch}
+.you .big{font-family:var(--display);font-weight:800;font-size:clamp(1.45rem,2.8vw,1.95rem);line-height:1.14;letter-spacing:-.04em;margin-top:26px;max-width:16ch}
+.you p.body{margin-top:16px;font-size:1.06rem;color:rgba(16,27,51,.82)}
+
+/* ---------- money ---------- */
+.money{background:var(--paper);padding-block:88px}
+.money-inner{max-width:820px}
+.money-inner > p{margin-top:26px;font-size:clamp(1.2rem,2.1vw,1.5rem);line-height:1.5;color:var(--ink);max-width:44ch}
+.money-inner > p:nth-of-type(2){color:var(--muted);font-size:1.1rem;max-width:56ch}
+
+/* ---------- faq ---------- */
+.faq{background:var(--white)}
+.faq-list{margin-top:46px;border-top:1px solid var(--line)}
+details{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-family:var(--display);font-weight:600;font-size:1.16rem;letter-spacing:-.02em;transition:color .2s ease}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);
+  background:linear-gradient(var(--ink),var(--ink)) center/13px 2px no-repeat,linear-gradient(var(--ink),var(--ink)) center/2px 13px no-repeat;
+  transition:transform .38s var(--ease),background-color .22s ease,border-color .22s ease}
+summary:hover::after{border-color:var(--cobalt)}
+details.is-open summary::after{transform:rotate(135deg);background-color:var(--cobalt);border-color:var(--cobalt);
+  background-image:linear-gradient(#fff,#fff),linear-gradient(#fff,#fff)}
+details.is-open summary{color:var(--cobalt)}
+details .ans{padding:0 44px 26px 0;color:var(--muted);max-width:60ch;font-size:1.04rem}
+
+/* ---------- finale ---------- */
+.finale{background:var(--saffron);color:var(--ink)}
+.finale h2{max-width:20ch;font-size:clamp(2rem,4.4vw,3.2rem)}
+.finale .lead{color:rgba(16,27,51,.78);margin-top:22px}
+.finale .cta-row{margin-top:34px}
+.finale .btn:hover{background:var(--ink);border-color:var(--ink)}
+.finale .aside{margin-top:22px;font-size:1rem;color:rgba(16,27,51,.74);max-width:52ch}
+.finale .aside a{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+
+/* ---------- booking calendar (finale) ---------- */
+.finale-grid{display:grid;grid-template-columns:minmax(0,1.1fr) auto;gap:64px;align-items:center}
+@media (max-width:1000px){.finale-grid{grid-template-columns:1fr;gap:40px}}
+.cal-wrap{display:flex;justify-content:center;padding:14px 26px 30px}
+
+.cal-art{
+  --navy:#141b34; --cal-paper:#f3f4f8; --cal-red:#d63c27; --cal-blue:#2f4cff;
+  --cal-yellow:#f2b035; --cal-green:#1f6b50;
+  position:relative; width:330px; flex:none;
+  transform:rotate(3deg); transform-origin:center;
+  font-family:var(--display); color:var(--navy);
+}
+.cal-art::before{content:""; position:absolute; inset:0; background:var(--navy); border-radius:26px; transform:translate(12px,14px)}
+.cal{position:relative; background:var(--cal-paper); border-radius:26px; padding-bottom:20px}
+
+.cal-rings{position:absolute; top:-18px; left:0; right:0; display:flex; justify-content:space-around; padding:0 70px; z-index:3}
+.cal-ring{width:16px; height:42px; background:var(--navy); border-radius:10px; position:relative}
+.cal-ring::after{content:""; position:absolute; left:4px; right:4px; top:6px; height:10px; border-radius:6px; background:var(--cal-paper); opacity:.9}
+
+.cal-head{background:var(--cal-red); color:#fff; border-radius:26px 26px 0 0;
+  padding:34px 26px 18px; display:flex; justify-content:space-between; align-items:flex-end;
+  position:relative; overflow:hidden}
+.cal-head::after{content:""; position:absolute; right:-34px; top:-44px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,.22)}
+.cal-month{font-weight:800; font-size:30px; letter-spacing:-.02em; line-height:1; position:relative; z-index:1}
+.cal-year{font-weight:700; font-size:15px; opacity:.85; position:relative; z-index:1}
+
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px 4px; padding:18px 18px 4px}
+.cal-dow{font-size:11px; font-weight:800; letter-spacing:.08em; text-align:center; color:#6b7390; padding-bottom:4px}
+.cal-day{aspect-ratio:1; display:grid; place-items:center; position:relative; font-size:15px; font-weight:700; border-radius:12px}
+.cal-day.off{opacity:.3}
+.cal-day.today{background:var(--cal-blue); color:#fff; border-radius:14px;
+  box-shadow:0 5px 0 var(--navy); transform:translateY(-3px) rotate(-4deg); z-index:2}
+
+.cal-tag{position:absolute; z-index:4; right:-26px; bottom:36px;
+  background:var(--cal-yellow); color:var(--navy); font-weight:800; font-size:15px;
+  padding:10px 18px; border-radius:999px; box-shadow:0 5px 0 var(--navy);
+  transform:rotate(-7deg); white-space:nowrap; animation:cal-bob 3.4s ease-in-out infinite}
+.cal-tag::before{content:"\2713 "; color:var(--cal-green)}
+
+.cal-badge{position:absolute; z-index:4; left:-18px; bottom:-18px; width:62px; height:62px; border-radius:50%;
+  background:var(--cal-green); box-shadow:0 5px 0 var(--navy); display:grid; place-items:center; transform:rotate(-10deg)}
+.cal-badge svg{width:30px; height:30px}
+
+@keyframes cal-bob{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(-5deg) translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.cal-tag{animation:none}}
+@media (max-width:420px){.cal-art{width:290px}}
+
+/* ---------- colour ribbon above the footer ---------- */
+.ribbon{display:flex;height:10px}
+.ribbon i{flex:1}
+.ribbon i:nth-child(1){background:#2F5BEA}
+.ribbon i:nth-child(2){background:#E8472B}
+.ribbon i:nth-child(3){background:#1F6B4F}
+.ribbon i:nth-child(4){background:#6B2D5C}
+.ribbon i:nth-child(5){background:#8FC1E8}
+.ribbon i:nth-child(6){background:#F4A21F}
+.ribbon i:nth-child(7){background:#1B2A4A}
+
+/* ---------- footer ---------- */
+footer.site{padding-block:34px;border-top:1px solid var(--line);font-size:.92rem;color:var(--muted);background:var(--paper)}
+footer.site .wrap{display:flex;flex-wrap:wrap;gap:14px 28px;justify-content:space-between;align-items:center}
+footer.site nav{display:flex;gap:24px}
+footer.site a{text-decoration:none}
+footer.site a:hover{text-decoration:underline;text-underline-offset:4px}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .62s ease,transform .62s var(--ease);transition-delay:var(--rd,0ms)}
+.rv.in{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top" id="top">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Byline Studio, home">
+      <svg class="brand-mark" viewBox="-6 0 106 88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M0 81V25.5A3.5 3.5 0 0 1 3.5 22H11.5A3.5 3.5 0 0 1 15 25.5V81Z" fill="#2F5BEA"/>
+        <path d="M19 81V7.5A3.5 3.5 0 0 1 22.5 4H32.5A3.5 3.5 0 0 1 36 7.5V81Z" fill="#F4A21F"/>
+        <path d="M40 81V37.5A3.5 3.5 0 0 1 43.5 34H51.5A3.5 3.5 0 0 1 55 37.5V81Z" fill="#1B2A4A"/>
+        <path d="M60 81V17.5A3.5 3.5 0 0 1 63.5 14H71.5A3.5 3.5 0 0 1 75 17.5V81Z" fill="#8FC1E8"/>
+        <path d="M80 81V31.5A3.5 3.5 0 0 1 83.5 28H91.5A3.5 3.5 0 0 1 95 31.5V81Z" fill="#E8472B"/>
+        <rect x="-6" y="84" width="106" height="4" rx="2" fill="#2E3A55"/>
+      </svg>
+      <span class="brand-word"><span class="bw-by">byline</span> <span class="bw-st">studio</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#formats">Formats</a>
+      <a href="#how">How it works</a>
+      <a href="#terms">The terms</a>
+      <a href="#questions">FAQ</a>
+    </nav>
+    <a class="btn small nav-cta" data-cta href="#next">Pick a time</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ==================== HERO ==================== -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1>The digital product only you could make.</h1>
+        <p class="lead">We write, design and produce custom digital products from your content, in your tone, for your followers. You only have to sell it.</p>
+        <div class="cta-row">
+          <a class="btn" data-cta href="#next">Pick a 30-minute slot <span class="arw" aria-hidden="true">→</span></a>
+          <a class="btn ghost" href="#formats">See what we make</a>
+        </div>
+      </div>
+      <div class="stack" aria-hidden="true">
+        <div class="sbook" style="--w:228px;--x:32px;--c:#F2B134;--t:#101B33;--d:5">Deep Focus</div>
+        <div class="sbook" style="--w:284px;--x:8px;--c:#8EC5E8;--t:#101B33;--d:4">Weekend Escapes</div>
+        <div class="sbook" style="--w:248px;--x:26px;--c:#6B2D5C;--t:#fff;--d:3">Calm Mind</div>
+        <div class="sbook" style="--w:312px;--x:0px;--c:#1F6B4F;--t:#fff;--d:2">Money, Plainly</div>
+        <div class="sbook" style="--w:262px;--x:18px;--c:#D43D28;--t:#fff;--d:1">Cook Once</div>
+        <div class="sbook" style="--w:298px;--x:4px;--c:#2B4EFF;--t:#fff;--d:0">The 30-Day Reset</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SHORT VERSION ==================== -->
+  <section class="short">
+    <div class="wrap">
+      <div class="short-head">
+        <h2>Why creators can trust the process.</h2>
+      </div>
+      <ol class="rows">
+        <li>
+          <div>
+            <b>We make the product.</b>
+            <p>A cookbook, a workbook, a journal, a guide. Digital and downloadable, built from your videos, posts and episodes, then designed so it looks like it belongs next to the things you already recommend.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>You don't write or design anything.</b>
+            <p>You read drafts and tell us what doesn't sound like you. No manuscript, no interviews, no homework, no new tool to learn.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>Your audience doesn't move an inch.</b>
+            <p>Your name is on it, your followers stay yours, and we stay behind the scenes. We're not building a channel out of yours.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ==================== FORMATS / SHELF ==================== -->
+  <section class="showcase" id="formats">
+    <div class="wrap">
+      <div class="showcase-head">
+        <div>
+          <h2>Seven products, so you know what we're capable of.</h2>
+        </div>
+        <p class="lead">These are samples. Yours is built from your own videos, posts and episodes, then written the way you talk. Pick a spine to open it.</p>
+      </div>
+      <div class="showcase-grid">
+        <div>
+          <div class="shelf" id="shelfScroll">
+            <div class="spines" id="spines" role="group" aria-label="Sample formats"></div>
+          </div>
+        </div>
+        <div class="panel" id="panel" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROCESS ==================== -->
+  <section id="how">
+    <div class="wrap">
+      <h2>From your content to a finished product.</h2>
+      <p class="lead">A clear path, with your approval at every stage. You're needed in two of the three.</p>
+      <ol class="steps">
+        <li>
+          <h3>We study your content</h3>
+          <p>We go through what you've published, learn your tone and find the topics your audience keeps coming back to. Nothing is written until we can hear you in the sentence.</p>
+          <span class="your"><b>Your part</b> nothing</span>
+        </li>
+        <li>
+          <h3>We build the product</h3>
+          <p>We write, edit and design it in your voice, then send you drafts to react to. Every claim is checked against what you actually said.</p>
+          <span class="your"><b>Your part</b> read two drafts</span>
+        </li>
+        <li>
+          <h3>You launch, we deliver</h3>
+          <p>We hand you everything you need to announce it. You share it in your own words, and we handle the rest.</p>
+          <span class="your"><b>Your part</b> one post</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ==================== SPLIT ==================== -->
+  <section class="dark">
+    <div class="wrap">
+      <h2>We handle the heavy part.</h2>
+      <div class="split">
+        <ul class="checks">
+          <li>Research and structure, drawn from your existing content</li>
+          <li>Writing in your voice, not in ours</li>
+          <li>Editing and fact-checking against your own words</li>
+          <li>Cover, layout and file production</li>
+          <li>Launch copy for your posts, emails and videos</li>
+          <li>Delivery of the product to every buyer</li>
+        </ul>
+        <div class="you">
+          <h3>You handle the easy part.</h3>
+          <p class="big">Share it with the people who already trust you.</p>
+          <p class="body">That's it. The product is ready, created for your audience, and waiting for your announcement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TERMS ==================== -->
+  <section class="money" id="terms">
+    <div class="wrap money-inner">
+      <h2>About the money.</h2>
+      <p>You won't find a number on this page, and that's deliberate. What you earn, what we earn, who owns what, all of it is written down, and we go through it line by line before anything is signed.</p>
+      <p>If a term doesn't fit your channel, say so. We'd rather change a clause than lose the partnership.</p>
+    </div>
+  </section>
+
+  <!-- ==================== FAQ ==================== -->
+  <section class="faq" id="questions">
+    <div class="wrap">
+      <h2>What creators ask first.</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Do I have to write anything?</summary>
+          <div class="ans">No. We work from content you've already published. You read drafts and tell us what feels wrong. Nobody asks you for a document, a file, or a login.</div>
+        </details>
+        <details>
+          <summary>Will it actually sound like me?</summary>
+          <div class="ans">That's the only thing we're selling. We study how you speak, the phrases you repeat, the way you explain things. Nothing releases until you say it sounds like you.</div>
+        </details>
+        <details>
+          <summary>What if I don't like the first draft?</summary>
+          <div class="ans">You send it back with notes and we rewrite it. There is no version of this where a product goes out that you didn't approve first.</div>
+        </details>
+        <details>
+          <summary>What happens after it's live?</summary>
+          <div class="ans">We deliver the files and the announcement copy. You post it once, in your own voice. Everything between the buyer and the product is ours to handle.</div>
+        </details>
+        <details>
+          <summary>What if now isn't the right moment?</summary>
+          <div class="ans">Then say so. We'll come back when the timing works for you. Nothing is signed until you sign it.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== NEXT ==================== -->
+  <section class="finale" id="next">
+    <div class="wrap finale-grid">
+      <div class="finale-copy">
+      <h2>Let's make your first product.</h2>
+      <p class="lead">Pick a slot and we'll walk you through the agreement, the timeline and a first concept for your product. No deck, no pitch, no pressure to decide on the call.</p>
+      <div class="cta-row">
+        <a class="btn" data-cta href="#next" data-primary>Book the call <span class="arw" aria-hidden="true">→</span></a>
+        <a class="btn ghost" data-mail-body data-cta data-secondary href="#">Or send us an email</a>
+      </div>
+      <p class="aside">No slot that works? <a data-mail-body href="#">Write to us with two times that do</a> and we'll make one fit.</p>
+      </div>
+
+      <div class="cal-wrap">
+        <div class="cal-art" id="calArt" role="img" aria-label="Calendar showing today's date with a 30-minute slot">
+          <div class="cal">
+            <div class="cal-rings"><span class="cal-ring"></span><span class="cal-ring"></span><span class="cal-ring"></span></div>
+
+            <div class="cal-head">
+              <span class="cal-month" id="calMonth">&nbsp;</span>
+              <span class="cal-year" id="calYear">&nbsp;</span>
+            </div>
+
+            <div class="cal-grid" id="calGrid">
+              <span class="cal-dow">S</span><span class="cal-dow">M</span><span class="cal-dow">T</span>
+              <span class="cal-dow">W</span><span class="cal-dow">T</span><span class="cal-dow">F</span><span class="cal-dow">S</span>
+            </div>
+          </div>
+
+          <span class="cal-tag">30 min</span>
+          <span class="cal-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="ribbon" aria-hidden="true">
+  <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<footer class="site">
+  <div class="wrap">
+    <span>&copy; <span id="year"></span> <span data-brand>Byline Studio</span></span>
+    <nav aria-label="Footer">
+      <a href="privacy.html">Privacy</a>
+      <a data-mail-link href="#">Email us</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+/* =========================================================================
+   CONFIG — the only things you need to change.
+   ========================================================================= */
+const BRAND        = "Byline Studio";        // shows in nav, footer, email subject
+const EMAIL        = "studiobyline@gmail.com"; // where replies land
+const CALENDLY_URL = "";                       // e.g. "https://calendly.com/bylineeditions/20min"
+                                               // leave empty and every CTA falls back to the email
+
+/* =========================================================================
+   SAMPLE FORMATS — edit copy, colors and spine sizes here.
+   `niche` matches the ?niche= parameter, for links you share.
+   ========================================================================= */
+const books = [
+  { title:"The 30-Day Reset", sub:"A day-by-day training plan", kind:"Fitness workbook",
+    niche:"fitness",
+    desc:"Thirty days of workouts, meals and check-ins, written the way you coach. Followers get a plan they can actually finish.",
+    from:"Workout videos and Q&A replies", length:"64 pages, 30 daily plans",
+    c:"#2B4EFF", t:"#FFFFFF", w:64, h:310,
+    pattern:"repeating-linear-gradient(135deg,rgba(255,255,255,.13) 0 10px,transparent 10px 20px)" },
+  { title:"Cook Once", sub:"Eat all week", kind:"Recipe cookbook",
+    niche:"food",
+    desc:"Meal-prep recipes, shopping lists and easy swaps, all in your kitchen voice. One cook on Sunday, dinner sorted for the week.",
+    from:"Recipe videos and caption tips", length:"120 pages, 40 recipes",
+    c:"#D43D28", t:"#FFFFFF", w:56, h:280,
+    pattern:"radial-gradient(circle at 78% 22%,rgba(255,255,255,.28) 0 24%,transparent 25%)" },
+  { title:"Money, Plainly", sub:"Personal finance without the jargon", kind:"Personal finance guide",
+    niche:"finance",
+    desc:"The money questions your audience keeps asking, answered in your tone, with worksheets they can fill in as they read.",
+    from:"Explainer videos and comment answers", length:"90 pages, 12 worksheets",
+    c:"#1F6B4F", t:"#FFFFFF", w:72, h:330,
+    pattern:"repeating-linear-gradient(0deg,rgba(255,255,255,.12) 0 2px,transparent 2px 16px)" },
+  { title:"Calm Mind", sub:"A guided journal for busy heads", kind:"Wellness journal",
+    niche:"wellness",
+    desc:"Daily prompts, short reflections and room to write, shaped around the themes you talk about most.",
+    from:"Podcast episodes and newsletters", length:"110 pages, 60 prompts",
+    c:"#6B2D5C", t:"#FFFFFF", w:60, h:295,
+    pattern:"radial-gradient(circle at 50% 112%,rgba(255,255,255,.22) 0 42%,transparent 43%)" },
+  { title:"Weekend Escapes", sub:"Twelve short trips, planned for you", kind:"Travel guide",
+    niche:"travel",
+    desc:"Twelve weekend itineraries with the spots, routes and tips you've shared on camera, gathered in one place.",
+    from:"Travel vlogs and saved routes", length:"80 pages, 12 itineraries",
+    c:"#8EC5E8", t:"#101B33", w:68, h:320,
+    pattern:"linear-gradient(160deg,transparent 52%,rgba(16,27,51,.14) 52% 74%,rgba(16,27,51,.28) 74%)" },
+  { title:"Deep Focus", sub:"A study system that sticks", kind:"Study playbook",
+    niche:"education",
+    desc:"A step-by-step system for focus, notes and exams, built from the study tips your followers ask you about.",
+    from:"Livestreams and study-tip posts", length:"70 pages, 5 routines",
+    c:"#F2B134", t:"#101B33", w:54, h:270,
+    pattern:"repeating-linear-gradient(90deg,rgba(16,27,51,.12) 0 2px,transparent 2px 18px)" },
+  { title:"Frame by Frame", sub:"A visual guide to your process", kind:"Photography guide",
+    niche:"photography",
+    desc:"Your editing workflow broken into clear steps, with before-and-after examples and exercises to try at home.",
+    from:"Tutorials and behind-the-scenes posts", length:"96 pages, 20 exercises",
+    c:"#2A2A2E", t:"#FFFFFF", w:62, h:300,
+    pattern:"radial-gradient(circle at 50% 42%,transparent 0 18%,rgba(255,255,255,.2) 18% 20%,transparent 20% 34%,rgba(255,255,255,.12) 34% 36%,transparent 36%)" }
+];
+
+/* =========================================================================
+   FRAME — brand, links, deep links. Usually nothing to touch below.
+   ========================================================================= */
+const params = new URLSearchParams(location.search);
+const niche  = (params.get("niche") || "").trim().toLowerCase();
+
+document.querySelectorAll("[data-brand]").forEach(el => el.textContent = BRAND);
+document.title = `${BRAND} | Digital products for creators`;
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/* one slot for every "book a call" button */
+document.querySelectorAll("[data-cta]").forEach(a => {
+  if (!CALENDLY_URL) { a.dataset.mailBody = ""; return; }
+  if (a.hasAttribute("data-mail-body")) return;
+  a.href = CALENDLY_URL;
+  a.target = "_blank";
+  a.rel = "noopener";
+});
+
+/* email fallbacks — prefilled so a creator never has to compose a sentence */
+function mailtoHref(subject, body){
+  return `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+const mailSubject = `${BRAND}: let's talk about a product`;
+const mailBody = `Hi,\n\nI'd like to talk about making a product together.\n\nMy channel:\nBest times for a 30-minute call:\n\n`;
+document.querySelectorAll("[data-mail-body]").forEach(a => {
+  a.href = mailtoHref(mailSubject, mailBody);
+});
+document.querySelectorAll("[data-mail-link]").forEach(a => {
+  a.href = `mailto:${EMAIL}`;
+  a.textContent = EMAIL;
+});
+/* if there is no calendar link yet, the primary CTA becomes the email and the
+   duplicate secondary button is removed */
+if (!CALENDLY_URL) {
+  document.querySelectorAll("[data-primary]").forEach(a => {
+    a.textContent = "Email us";
+    a.href = mailtoHref(mailSubject, mailBody);
+  });
+  document.querySelectorAll("[data-secondary]").forEach(a => { a.hidden = true; });
+}
+
+/* =========================================================================
+   SHELF
+   ========================================================================= */
+const spinesEl = document.getElementById("spines");
+const panel    = document.getElementById("panel");
+
+books.forEach((b, i) => {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "spine";
+  btn.style.cssText = `--c:${b.c};--t:${b.t};--w:${b.w};--h:${b.h};--i:${i}`;
+  btn.setAttribute("aria-pressed", "false");
+  btn.setAttribute("aria-label", `${b.title}, ${b.kind}`);
+  btn.dataset.niche = b.niche;
+  btn.innerHTML = `<span>${b.title}</span>`;
+  btn.addEventListener("click", () => select(i));
+  spinesEl.appendChild(btn);
+});
+
+function render(b) {
+  panel.innerHTML = `
+    <div class="cover" style="background-color:${b.c};background-image:${b.pattern};color:${b.t}">
+      <b>${b.title}</b>
+      <small>by [your name]</small>
+    </div>
+    <div class="detail">
+      <h3>${b.title}</h3>
+      <p class="sub">${b.sub}</p>
+      <p class="desc">${b.desc}</p>
+      <ul class="facts">
+        <li><b>Type</b><span>${b.kind}</span></li>
+        <li><b>Built from</b><span>${b.from}</span></li>
+        <li><b>Length</b><span>${b.length}</span></li>
+      </ul>
+      <p class="sample-note">A sample product. Yours is built from your own content.</p>
+    </div>`;
+}
+
+let current = -1;
+function select(i) {
+  if (i === current) return;
+  const first = current === -1;
+  current = i;
+  [...spinesEl.children].forEach((s, k) => s.setAttribute("aria-pressed", String(k === i)));
+  if (first) { render(books[i]); return; }
+  panel.classList.add("swap");
+  setTimeout(() => { render(books[i]); panel.classList.remove("swap"); }, 150);
+}
+/* open the format that matches ?niche=, else the first */
+const start = books.findIndex(b => niche && b.niche === niche);
+select(start > -1 ? start : 0);
+
+/* =========================================================================
+   FAQ — native <details>, animated open/close
+   ========================================================================= */
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Accordion: only one answer open at a time */
+const faqItems = [...document.querySelectorAll(".faq-list details")];
+const faqAnims = new WeakMap();
+let faqOpen = null;
+const FAQ_DUR = 380, FAQ_EASE = "cubic-bezier(.22,.85,.24,1)";
+
+function faqHeight(d, open) {
+  const sum = d.querySelector("summary");
+  const ans = d.querySelector(".ans");
+  const cs = getComputedStyle(d);
+  const borders = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+  const closed = sum.offsetHeight + borders;
+  return open ? closed + ans.offsetHeight : closed;
+}
+
+function faqSet(d, open) {
+  const ans = d.querySelector(".ans");
+  const prev = faqAnims.get(d);
+  if (prev) prev.cancel();
+
+  d.classList.toggle("is-open", open);
+
+  if (reduceMotion) {
+    d.open = open;
+    d.style.height = d.style.overflow = "";
+    faqAnims.delete(d);
+    return;
+  }
+
+  const startH = d.offsetHeight;
+  if (open) d.open = true;
+  const endH = faqHeight(d, open);
+
+  d.style.overflow = "hidden";
+  const a = d.animate({ height: [startH + "px", endH + "px"] }, { duration: FAQ_DUR, easing: FAQ_EASE });
+  ans.animate(
+    { opacity: open ? [0, 1] : [1, 0], transform: open ? ["translateY(-6px)", "none"] : ["none", "translateY(-6px)"] },
+    { duration: FAQ_DUR, easing: "ease" }
+  );
+  faqAnims.set(d, a);
+  const done = () => {
+    if (faqAnims.get(d) !== a) return;
+    if (!open) d.open = false;
+    d.style.height = d.style.overflow = "";
+    faqAnims.delete(d);
+  };
+  a.onfinish = done;
+  setTimeout(done, FAQ_DUR + 60);   // fallback: never leave a box mid-animation
+}
+
+faqItems.forEach(d => {
+  d.querySelector("summary").addEventListener("click", e => {
+    e.preventDefault();
+    const willOpen = !d.classList.contains("is-open");
+    if (willOpen && faqOpen && faqOpen !== d) faqSet(faqOpen, false);
+    faqSet(d, willOpen);
+    faqOpen = willOpen ? d : null;
+  });
+});
+
+/* =========================================================================
+   Logo hover: the shelf stays put, each book rises by mouse proximity
+   ========================================================================= */
+(function () {
+  const mark = document.querySelector(".brand-mark");
+  const link = document.querySelector(".brand");
+  if (!mark || !link || reduceMotion) return;
+
+  const books = [...mark.querySelectorAll("path")];
+  const VIEW_H = 88;              // svg viewBox height
+  const MAX_PX = 5.5;             // highest a book can rise on screen
+  const REACH = 95;               // px of cursor influence per book
+  let lastX = 0;
+
+  function paint() {
+    const rect = mark.getBoundingClientRect();
+    if (!rect.height) return;
+    const unitsPerPx = VIEW_H / rect.height;
+
+    books.forEach((book, i) => {
+      const b = book.getBoundingClientRect();
+      const dx = Math.abs(lastX - (b.left + b.width / 2));
+      const t = Math.max(0, 1 - dx / REACH);
+      // books further from the cursor rise less; a small per-book offset keeps them uneven
+      const px = Math.pow(t, 1.7) * MAX_PX * (0.82 + (i % 3) * 0.09);
+      book.style.transform = "translateY(" + (-px * unitsPerPx).toFixed(2) + "px)";
+    });
+  }
+
+  link.addEventListener("mousemove", e => {
+    lastX = e.clientX;
+    paint();                       // 5 transforms per move is cheaper than scheduling
+  });
+  link.addEventListener("mouseleave", () => {
+    books.forEach(book => { book.style.transform = ""; });
+  });
+})();
+
+/* =========================================================================
+   Details: nav hairline on scroll + gentle reveal
+   ========================================================================= */
+const topbar = document.getElementById("top");
+addEventListener("scroll", () => {
+  topbar.classList.toggle("stuck", scrollY > 8);
+}, { passive: true });
+
+if (!reduceMotion && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, { threshold: .14 });
+  document.querySelectorAll(".rows li, .steps li, .checks li, .you, .faq-list details, .money p").forEach(el => {
+    const siblings = [...el.parentElement.children];
+    el.style.setProperty("--rd", (siblings.indexOf(el) * 80) + "ms");
+    el.classList.add("rv");
+    io.observe(el);
+  });
+}
+</script>
+
+<script>
+/* booking calendar — shows the visitor's today with the 30-minute slot */
+(function () {
+  var MONTHS = ["January","February","March","April","May","June","July",
+                "August","September","October","November","December"];
+  var grid  = document.getElementById("calGrid");
+  var monthEl = document.getElementById("calMonth");
+  var yearEl  = document.getElementById("calYear");
+  var art   = document.getElementById("calArt");
+  if (!grid) return;
+
+  function render() {
+    var now = new Date();
+    var y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+
+    monthEl.textContent = MONTHS[m];
+    yearEl.textContent  = y;
+    art.setAttribute("aria-label",
+      "Calendar showing today, " + MONTHS[m] + " " + d + ", " + y + ", with a 30-minute slot");
+
+    var old = grid.querySelectorAll(".cal-day");
+    for (var i = 0; i < old.length; i++) grid.removeChild(old[i]);
+
+    var firstDow  = new Date(y, m, 1).getDay();
+    var daysInMon = new Date(y, m + 1, 0).getDate();
+    var daysInPrev = new Date(y, m, 0).getDate();
+
+    for (var c = 0; c < 42; c++) {
+      var cell = document.createElement("span");
+      cell.className = "cal-day";
+      var n = c - firstDow + 1;
+
+      if (n < 1) { cell.className += " off"; cell.textContent = daysInPrev + n; }
+      else if (n > daysInMon) { cell.className += " off"; cell.textContent = n - daysInMon; }
+      else {
+        cell.textContent = n;
+        if (n === d) cell.className += " today";
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  render();
+
+  function scheduleMidnight() {
+    var now = new Date();
+    var next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+    setTimeout(function () { render(); scheduleMidnight(); }, next - now);
+  }
+  scheduleMidnight();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+# Byline Studio — site
+
+Página única do estúdio que produz produtos digitais sob medida a partir do conteúdo de criadores. Site normal, sem campanha: serve para o criador que chega por indicação, por busca ou por um link que você mandou.
+
+## Arquivos
+
+| Arquivo | O que é |
+|---|---|
+| `index.html` | a página inteira (CSS e JS embutidos, sem build, sem dependências) |
+| `privacy.html` | política de privacidade em linguagem simples |
+| `og-image.png` | 1200×630 — o cartão que aparece quando alguém compartilha o link |
+| `favicon.svg` | ícone da aba |
+| `preview-desktop.png` / `preview-mobile.png` | primeira tela em 1440×900 e 500×800 (não precisam ir para o servidor) |
+| `preview-finale.png` | a seção amarela com o calendário, 1440×520 |
+
+Nenhum arquivo depende de servidor, Node, npm ou build step. Copiar a pasta para qualquer host funciona.
+
+## O que você precisa preencher (3 linhas)
+
+No topo do `<script>` de `index.html`:
+
+```js
+const BRAND        = "Byline Studio";
+const EMAIL        = "studiobyline@gmail.com";
+const CALENDLY_URL = "";   // ← cole seu link do Calendly aqui
+```
+
+Enquanto `CALENDLY_URL` estiver vazio, o botão principal vira **"Email us"** com a mensagem já escrita, e o secundário se esconde. A página nunca fica com botão morto.
+
+## Link com nicho
+
+Opcional. Um link como `https://bylineeditions.com/?niche=food` abre a lombada correspondente já selecionada.
+Valores: `fitness`, `food`, `finance`, `wellness`, `travel`, `education`, `photography`.
+Sem o parâmetro, a página abre no primeiro formato.
+
+## Deploy
+
+1. Suba os arquivos na raiz do domínio (ou numa pasta — os caminhos são relativos).
+2. Se ficar em subpasta, troque `content="og-image.png"` por `content="https://seudominio.com/og-image.png"` — alguns previews exigem URL absoluta.
+3. A página está com `noindex, nofollow`: não aparece em busca. Se quiser que apareça, apague essa linha; é a única mudança necessária.
+
+## O que a página promete (confirme antes de publicar)
+
+A página não inventa fato nenhum — mas afirma coisas sobre o seu processo. Você precisa conseguir cumprir todas:
+
+- Você aprova cada rascunho antes de qualquer publicação; nada sai sem o seu sim.
+- A escrita, a capa e os arquivos são produzidos por você; o criador não escreve nem diagrama.
+- A entrega ao comprador é sua ("everything between the buyer and the product is ours to handle").
+- Você entrega o material de anúncio (copy + imagens) junto com o produto.
+- A conversa sobre termos acontece linha por linha, e cláusula pode ser negociada.
+
+Se alguma dessas não for verdade, me diga qual e eu reescrevo a seção — não deixo a página prometer o que você não faz.
+
+## O que ficou de fora, de propósito
+
+- **Preço, divisão de receita, propriedade, prazo.** Nenhum número no site. A seção "The terms" diz que os termos são escritos e revisados linha por linha antes de assinar. Quando você tiver os números, viram uma seção própria.
+- **Depoimentos.** Nada. Placeholder em página de confiança é pior que ausência.
+- **Página de Terms.** Não se publica termo de um acordo que ainda não existe.
+- **Formulário.** Não existe: CTA é agenda ou e-mail. Zero fricção, zero dado coletado.
+
+## Decisões de estrutura que valem saber
+
+- **A estante é o sistema visual.** Os sete formatos são amostras de produto (cookbook, workbook, journal, guide), não trabalhos de clientes — o painel diz isso explicitamente.
+- **"Digital product" no posicionamento, "livro" no formato.** O hero fala de produto digital; os formatos mostram que o produto é um livro/workbook. Se um dia você fizer curso ou ferramenta, a estante continua servindo.
+- **Sem a moldura de convite.** Não há "prepared for [nome]", nem "you got our email", nem `?name=`. A página se sustenta sozinha em qualquer origem de tráfego.
+
+## Pendências suas
+
+1. O site usa `studiobyline@gmail.com` (Gmail). Se um dia registrar `bylineeditions.com`, troque só a constante `EMAIL`.
+2. Criar a conta no Calendly e colar o link.
+3. Confirmar a lista de promessas acima.
+4. Logo definitivo — o mark de três lombadas é placeholder funcional e já combina com a página.
+5. Se trocar o nome da marca: `BRAND`, `EMAIL`, `<title>`, os `[data-brand]`, `og:site_name`, `og:title` e `og-image.png`. Eu refaço em um minuto.
