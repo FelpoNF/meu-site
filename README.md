@@ -11,10 +11,11 @@ Página única do estúdio que produz produtos digitais sob medida a partir do c
 | `og-image.png` | 1200×630 — o cartão que aparece quando alguém compartilha o link |
 | `favicon.svg` | ícone da aba (os cinco livros, fundo transparente, 675 bytes) |
 | `apple-touch-icon.png` | 180×180 — ícone do atalho na tela inicial do iPhone (iOS ignora transparência, por isso tem fundo `#F2F4F7`) |
+| `verify.py` | verificação de desenvolvimento (144 checagens em Chrome headless); não precisa ir para o servidor |
 | `preview-desktop.png` / `preview-mobile.png` | primeira tela em 1440×900 e 500×800 (não precisam ir para o servidor) |
 | `preview-finale.png` | a seção amarela com o calendário, 1440×520 |
 
-Nenhum arquivo depende de servidor, Node, npm ou build step. Copiar a pasta para qualquer host funciona.
+Nenhum arquivo do site depende de servidor, Node, npm ou build step. Copiar a pasta para qualquer host funciona.
 
 ## O que você precisa preencher (3 linhas)
 
@@ -40,6 +41,20 @@ Sem o parâmetro, a página abre no primeiro formato.
 1. Suba os arquivos na raiz do domínio (ou numa pasta — os caminhos são relativos).
 2. Se ficar em subpasta, troque `content="og-image.png"` por `content="https://seudominio.com/og-image.png"` — alguns previews exigem URL absoluta.
 3. A página está com `noindex, nofollow`: não aparece em busca. Se quiser que apareça, apague essa linha; é a única mudança necessária.
+
+## Verificação
+
+Não existe build nem framework de teste: a página é um HTML estático com CSS e JS inline. O `verify.py` é a suíte que existe — ele abre a página num Chrome headless de verdade e mede o que foi renderizado, em vez de confiar no código-fonte.
+
+```bash
+python3 verify.py
+```
+
+144 checagens: marca e logo, hero em 2 linhas e 90svh em sete larguras, os 3 passos, acordeão do FAQ (uma resposta aberta por vez), simetria do FAQ, faixa de 7 segmentos, botão do WhatsApp, ícone da aba, calendário desenhado, overflow e erros de JS. Sai com `0` quando tudo passa e `1` quando algo falha; em caso de falha os arquivos de probe ficam em `%TEMP%` para inspeção.
+
+Precisa de Python 3 e Chrome (o `CHROME_PATH` resolve se o Chrome estiver fora do padrão). Se o `node` existir, ele também valida a sintaxe dos scripts inline; sem node essa checagem é pulada e o script diz isso.
+
+Rodar sempre depois de editar `index.html` ou `privacy.html`, e antes de dar push.
 
 ## O que a página promete (confirme antes de publicar)
 
