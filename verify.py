@@ -347,10 +347,13 @@ chk("intro speaks the site palette", "2F60E3" not in html.upper() and "F5A623" n
 INTRO = """<script>
 (function(){
   var out={}, t0=Date.now(), done=false;
+  (function(){ var st=document.getElementById("stage");
+    out.firstPaintVis = st ? getComputedStyle(st).visibility : "none"; })();
   function read(){
     var st=document.querySelector("#stage .brand"), nv=document.querySelector(".top .brand");
     var sr=st.getBoundingClientRect(), nr=nv.getBoundingClientRect(), pg=document.getElementById("page");
     out.intro=document.documentElement.classList.contains("intro");
+    out.playingVis=getComputedStyle(document.getElementById("stage")).visibility;
     out.stageH=Math.round(sr.height);
     out.ratio=(sr.width/sr.height).toFixed(3);
     out.navRatio=(nr.width/nr.height).toFixed(3);
@@ -400,6 +403,10 @@ m = re.search(r"<title>INTRO\|([^<]*)</title>", out)
 if m:
     d = dict(kv.split("=", 1) for kv in m.group(1).split(";") if "=" in kv)
     chk("curtain is up on a first load", d.get("intro") == "true", d.get("error", ""))
+    chk("nothing shows before the timeline exists (no flash of the finished logo)",
+        d.get("firstPaintVis") == "hidden", d.get("firstPaintVis"))
+    chk("stage turns visible once the timeline is running",
+        d.get("playingVis") == "visible", d.get("playingVis"))
     chk("stage lockup is big", d.get("stageH", "0").isdigit() and int(d.get("stageH", 0)) >= 100, d.get("stageH"))
     chk("stage and nav lockups share proportions (landing cannot distort)",
         abs(float(d.get("ratio", 0)) - float(d.get("navRatio", 1))) <= 0.01,

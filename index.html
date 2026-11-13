@@ -330,7 +330,7 @@ footer.site a:hover{text-decoration:underline;text-underline-offset:4px}
 .page{position:relative;z-index:20;background:var(--paper)}
 .veil,.stage,.ring{display:none}
 html.intro .veil{display:block}
-html.intro .stage{display:grid;pointer-events:auto;cursor:pointer}
+html.intro .stage{display:grid;pointer-events:auto;cursor:pointer;visibility:hidden}
 html.intro .ring{display:block}
 html.intro,html.intro body{overflow:hidden;height:100%}
 html.intro{scrollbar-gutter:stable}   /* keep the scrollbar's space: no 7px jump when the curtain opens */
@@ -1004,6 +1004,7 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     clearTimeout(stopTimer);
     anims.forEach(a => { try { a.cancel(); } catch (e) {} });
     anims = [];
+    stage.style.visibility = "";
     root.classList.remove("intro");   // the nav logo is exactly where the flight landed
     page.style.clipPath = "";
     page.inert = false;
@@ -1073,6 +1074,8 @@ if (!reduceMotion && "IntersectionObserver" in window) {
       { width: (rMax * 2) + "px", height: (rMax * 2) + "px", opacity: .95, offset: .65 },
       { width: (rMax * 2) + "px", height: (rMax * 2) + "px", opacity: 0, offset: 1 }
     ], { delay: T.reveal, duration: T.revealDur, easing: "cubic-bezier(.55,0,.25,1)" });
+
+    stage.style.visibility = "visible";   // only now: first visible frame is the drawn-back stage
 
     open.finished.then(finish, finish);
     stopTimer = setTimeout(finish, T.reveal + T.revealDur + 2500);   // never leave the page hijacked
