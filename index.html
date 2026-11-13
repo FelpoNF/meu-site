@@ -324,10 +324,9 @@ footer.site a:hover{text-decoration:underline;text-underline-offset:4px}
   *,*::before,*::after{animation:none!important;transition:none!important}
   .rv{opacity:1;transform:none}
 }
-}
 
 /* ---------- intro: the shelf builds, the name arrives, the page opens ---------- */
-.page{position:relative;z-index:20;background:var(--paper)}
+.page{position:relative;z-index:20;background:var(--paper);transform-origin:0 0}
 .veil,.stage,.ring{display:none}
 html.intro .veil{display:block}
 html.intro .stage{display:grid;pointer-events:auto;cursor:pointer;visibility:hidden}
@@ -335,7 +334,8 @@ html.intro .ring{display:block}
 html.intro,html.intro body{overflow:hidden;height:100%}
 html.intro{scrollbar-gutter:stable}   /* keep the scrollbar's space: no 7px jump when the curtain opens */
 html.intro .page{clip-path:circle(0px at 0 0)}
-html.intro .nav .brand{visibility:hidden}      /* the flight lands exactly on this slot */
+html.intro .nav .brand{visibility:hidden}      /* the wave starts on this slot */
+html.intro .top{position:static}               /* sticky inside a scaled ancestor jumps; nothing scrolls during the curtain */
 .veil{position:fixed;inset:0;z-index:10;background:var(--paper)}
 .stage{position:fixed;inset:0;z-index:30;place-items:center;pointer-events:none}
 .stage-lock{display:block;transform-origin:0 0;will-change:transform}
@@ -344,7 +344,7 @@ html.intro .nav .brand{visibility:hidden}      /* the flight lands exactly on th
 .stage .shelf{transform-box:fill-box;transform-origin:50% 50%}
 .stage .brand-word{will-change:clip-path,transform}
 .ring{--ring:conic-gradient(from 90deg at 50% 50%,var(--cobalt) 0deg,var(--sky) 24deg,var(--saffron) 50deg,var(--tomato) 76deg,var(--cobalt) 100deg,var(--cobalt) 360deg);
-  position:fixed;left:0;top:0;z-index:25;width:0;height:0;border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;
+  position:fixed;left:0;top:0;z-index:25;width:0;height:0;border-radius:50%;transform-origin:50% 50%;opacity:0;pointer-events:none;
   background:var(--ring);
   -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4.5px));
   mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4.5px))}
@@ -995,18 +995,21 @@ if (!reduceMotion && "IntersectionObserver" in window) {
   const ring = document.getElementById("ring");
   const navLogo = document.querySelector(".top .brand");
 
-  let anims = [], running = false, stopTimer = 0;
+  let anims = [], running = false, stopTimer = 0, swapTimer = 0;
   const A = (el, kf, o) => { const a = el.animate(kf, { fill: "both", ...o }); anims.push(a); return a; };
 
   function finish() {
     if (!running) return;
     running = false;
     clearTimeout(stopTimer);
+    [].concat(swapTimer).forEach(clearTimeout);
+    root.classList.remove("intro");    // class first: no frame where the page is clipped and unclipped
     anims.forEach(a => { try { a.cancel(); } catch (e) {} });
     anims = [];
     stage.style.visibility = "";
-    root.classList.remove("intro");   // the nav logo is exactly where the flight landed
+    navLogo.style.visibility = "";
     page.style.clipPath = "";
+    page.style.transform = "";
     page.inert = false;
   }
 
@@ -1019,8 +1022,8 @@ if (!reduceMotion && "IntersectionObserver" in window) {
 
     // timeline in ms, divided by the pace that was signed off
     const T = { shelf: 150, shelfDur: 650, book0: 700, bookGap: 260, bookDur: 850,
-                word: 2900, wordDur: 1000, fly: 4350, flyDur: 1100,
-                reveal: 4470, revealDur: 1250 };
+                word: 2900, wordDur: 1000, hold: 180, zoomDur: 1350 };
+    T.zoom = T.word + T.wordDur + T.hold;      // the wave leaves the moment the name finishes
     const SPEED = 1.265;
     for (const k in T) T[k] = Math.round(T[k] / SPEED);
 
@@ -1030,10 +1033,15 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     // how far the pair must start to the right so the icon alone sits dead centre
     const iconW = logo.querySelector(".brand-mark").getBoundingClientRect().width;
     const centreShift = (from.width - iconW) / 2;
-    const scale = to.width / from.width;
-    const dx = to.left - from.left;   // the lock ends at translateX(0): from.left is where it stays
-    const dy = to.top - from.top;
-    const rMax = Math.hypot(innerWidth, innerHeight) + 60;
+    // the page is born scaled so that the nav logo inside it is exactly the big logo:
+    // that is what makes the hand-off invisible and lets the frame do the travelling
+    const k0 = from.width / to.width;
+    const tx = from.left - to.left * k0;
+    const ty = from.top - to.top * k0;
+    const cxP = to.left + to.width / 2;    // the nav logo's centre, in page coordinates
+    const cyP = to.top + to.height / 2;
+    const rStart = from.width / 2;         // the wave starts as wide as the logo
+    const rMax = Math.hypot(innerWidth, innerHeight) + 80;
 
     // 1 · the shelf draws itself in
     A(shelf, [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
@@ -1061,24 +1069,39 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     A(lock, [{ transform: `translateX(${centreShift}px)` }, { transform: "translateX(0px)" }],
       { delay: T.word, duration: T.wordDur, easing: ease3 });
 
-    // 4 · the logo shrinks into the nav slot, and the page opens from that corner
-    A(logo, [{ transform: "none" },
-             { transform: `translate(${dx}px,${dy}px) scale(${scale})` }],
-      { delay: T.fly, duration: T.flyDur, easing: "cubic-bezier(.75,0,.2,1)" });
+    // 4 · the wave: the frame recedes from the logo and the site comes out of it
+    //     one value drives it all — the aperture, the ring on its edge, and the scale of the
+    //     page — so logo, wave and hole stay concentric while the logo walks to the nav slot
+    const N = 16, easeOut = p => 1 - Math.pow(1 - p, 3);
+    const pageKf = [], ringKf = [];
+    ring.style.width = ring.style.height = (rMax * 2) + "px";   // sized once, only transforms after
+    for (let i = 0; i <= N; i++) {
+      const p = i / N, u = easeOut(p);
+      const k = k0 + (1 - k0) * u;
+      const dx = tx * (1 - u), dy = ty * (1 - u);
+      const rs = rStart + (rMax - rStart) * easeOut(p);          // aperture radius, on screen
+      pageKf.push({ offset: p,
+        transform: `translate(${dx.toFixed(2)}px,${dy.toFixed(2)}px) scale(${k.toFixed(4)})`,
+        clipPath: `circle(${(rs / k).toFixed(1)}px at ${cxP.toFixed(1)}px ${cyP.toFixed(1)}px)` });
+      const scx = dx + cxP * k, scy = dy + cyP * k;              // where that centre lands on screen
+      ringKf.push({ offset: p,
+        transform: `translate(${(scx - rMax).toFixed(2)}px,${(scy - rMax).toFixed(2)}px) scale(${(rs / rMax).toFixed(4)})`,
+        opacity: p < .72 ? .95 : Math.max(0, .95 * (1 - (p - .72) / .28)) });
+    }
 
-    const open = A(page, [{ clipPath: "circle(0px at 0 0)" }, { clipPath: `circle(${rMax}px at 0 0)` }],
-      { delay: T.reveal, duration: T.revealDur, easing: "cubic-bezier(.55,0,.25,1)" });
+    // the swap is invisible only because, for a few frames, these two logos are the same pixels:
+    // reveal the page's copy first, drop the stage's copy right after, never the other way round
+    swapTimer = setTimeout(() => { navLogo.style.visibility = "visible"; }, Math.max(0, T.zoom - 20));
+    swapTimer = [swapTimer, setTimeout(() => { stage.style.visibility = "hidden"; }, T.zoom + 80)];
 
-    A(ring, [
-      { width: "0px", height: "0px", opacity: .95, offset: 0 },
-      { width: (rMax * 2) + "px", height: (rMax * 2) + "px", opacity: .95, offset: .65 },
-      { width: (rMax * 2) + "px", height: (rMax * 2) + "px", opacity: 0, offset: 1 }
-    ], { delay: T.reveal, duration: T.revealDur, easing: "cubic-bezier(.55,0,.25,1)" });
+    const zoomAnim = A(page, pageKf, { delay: T.zoom, duration: T.zoomDur, easing: "linear", fill: "forwards" });
+    A(ring, ringKf, { delay: T.zoom, duration: T.zoomDur, easing: "linear", fill: "forwards" });
 
-    stage.style.visibility = "visible";   // only now: first visible frame is the drawn-back stage
+    stage.style.visibility = "visible";   // first visible frame is the drawn-back stage
+    window.bylineIntro.timeline = T;
 
-    open.finished.then(finish, finish);
-    stopTimer = setTimeout(finish, T.reveal + T.revealDur + 2500);   // never leave the page hijacked
+    zoomAnim.finished.then(finish, finish);
+    stopTimer = setTimeout(finish, T.zoom + T.zoomDur + 1500);   // never leave the page hijacked
   }
 
   // any click on the curtain, or Esc / Space, gets you straight to the page

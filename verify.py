@@ -376,17 +376,44 @@ INTRO = """<script>
     var kv=[]; for(var k in out) kv.push(k+"="+out[k]);
     document.title="INTRO|"+kv.join(";");
   }
-  function landing(){
-    var st=document.querySelector("#stage .brand").getBoundingClientRect();
-    var nv=document.querySelector(".top .brand").getBoundingClientRect();
-    out.dLeft=Math.round(st.left-nv.left); out.dTop=Math.round(st.top-nv.top);
-    out.dW=Math.round(st.width-nv.width); out.dH=Math.round(st.height-nv.height);
+  // walk the wave: is the page's own logo exactly on the big one at the start,
+  // is the ring concentric with it, and does the page end at its natural scale?
+  function wave(){
+    var T = window.bylineIntro.timeline;
+    var nv0 = document.querySelector(".top .brand").getBoundingClientRect();
+    window.bylineIntro.seek(T.zoom + Math.round(T.zoomDur * .5));
+    setTimeout(function(){
+      var pg=document.getElementById("page"), cs=getComputedStyle(pg);
+      var m=cs.transform.match(/matrix\(([-\d.]+), 0, 0, ([-\d.]+), ([-\d.]+), ([-\d.]+)\)/);
+      if (m) {
+        var k=+m[2], tx=+m[3], nv1=document.querySelector(".top .brand").getBoundingClientRect();
+        out.midErrL=Math.round(nv1.left-(nv0.left*k+tx));
+        out.midErrW=Math.round(nv1.width-nv0.width*k);
+      }
+    }, 170);
+    window.bylineIntro.seek(T.zoom);
+    setTimeout(function(){
+      var st=document.querySelector("#stage .brand").getBoundingClientRect();
+      var nv=document.querySelector(".top .brand").getBoundingClientRect();
+      out.dLeft=Math.round(nv.left-st.left); out.dTop=Math.round(nv.top-st.top);
+      out.dW=Math.round(nv.width-st.width); out.dH=Math.round(nv.height-st.height);
+      var rg=document.getElementById("ring").getBoundingClientRect();
+      out.ringOff=Math.round(Math.abs((rg.left+rg.width/2)-(st.left+st.width/2)));
+      window.bylineIntro.seek(T.zoom + T.zoomDur);
+      setTimeout(function(){
+        var pg=document.getElementById("page");
+        out.endTransform=getComputedStyle(pg).transform;
+        out.endClip=(getComputedStyle(pg).clipPath||"none").slice(0,46);
+        out.endNav=getComputedStyle(document.querySelector(".top .brand")).visibility;
+        window.bylineIntro.skip();
+        setTimeout(after,300);
+      }, 170);
+    }, 170);
   }
   (function wait(){
     if(window.bylineIntro&&window.bylineIntro.ready){
       read();
-      window.bylineIntro.seek(4500);            // past the flight: where does it actually end up?
-      setTimeout(function(){ landing(); window.bylineIntro.skip(); setTimeout(after,300); }, 160);
+      wave();
       return;
     }
     if(Date.now()-t0>6000){ out.error="intro never became ready"; after(); return; }
@@ -417,10 +444,22 @@ if m:
     chk("intro wordmark paints the cobalt", d.get("word") == "rgb(43, 78, 255)", d.get("word"))
     chk("page starts clipped to the corner", d.get("clip", "none").startswith("circle(0px"), d.get("clip"))
     chk("page is inert behind the curtain", d.get("inert") == "true", d.get("inert"))
-    chk("the flight lands exactly on the nav slot",
+    chk("the wave starts with the page's logo exactly on the big logo",
         all(d.get(k, "99").lstrip("-").isdigit() and abs(int(d.get(k, 99))) <= 1
             for k in ("dLeft", "dTop", "dW", "dH")),
         f"dx={d.get('dLeft')} dy={d.get('dTop')} dw={d.get('dW')} dh={d.get('dH')}")
+    chk("everything inside the page scales as one (nav does not drift)",
+        d.get("midErrL", "99").lstrip("-").isdigit() and abs(int(d.get("midErrL", 99))) <= 1
+        and abs(int(d.get("midErrW", 99))) <= 1, f"dL={d.get('midErrL')} dW={d.get('midErrW')}")
+    chk("the ring leaves concentric with the logo", d.get("ringOff", "99").isdigit()
+        and int(d.get("ringOff", 99)) <= 2, d.get("ringOff"))
+    chk("the page ends at its natural scale",
+        (d.get("endTransform") or "").replace(" ", "") in ("matrix(1,0,0,1,0,0)", "none"),
+        d.get("endTransform"))
+    chk("by the end the aperture has swallowed the screen",
+        re.search(r"circle\((1[5-9]\d\d|2\d\d\d)(\.\d+)?px", d.get("endClip") or "")
+        is not None, d.get("endClip"))
+    # the visibility swap runs on a timer, which a paused timeline cannot drive: covered by afterNav
     chk("skip reveals the page", d.get("afterIntro") == "false" and d.get("afterClip") == "none", d.get("afterClip"))
     chk("skip un-hides the nav logo", d.get("afterNav") == "visible", d.get("afterNav"))
     chk("skip makes the page focusable again", d.get("afterInert") == "false", d.get("afterInert"))

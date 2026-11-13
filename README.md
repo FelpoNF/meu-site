@@ -44,13 +44,14 @@ Sem o parâmetro, a página abre no primeiro formato.
 
 ## A intro
 
-A primeira carga de cada sessão abre com uma cortina: a prateleira se desenha, os cinco livros caem, o nome sai de trás do ícone, o logo voa para o canto da nav e a página se abre num círculo que sai dali.
+A primeira carga de cada sessão abre com uma cortina: a prateleira se desenha, os cinco livros caem, o nome sai de trás do ícone e, então, uma onda colorida nasce da logo e o site cresce dentro dela. A logo não viaja até o canto: é o quadro inteiro que se afasta dela.
 
 - Roda **uma vez por sessão** (`sessionStorage`, chave `byline-intro`). Recarregar na mesma aba não repete; aba nova ou anônima repete.
 - Qualquer clique na tela, `Esc` ou `Espaço` pula direto para a página.
 - Quem configurou `prefers-reduced-motion` não vê nada: a página abre normal, sem cortina.
 - O ritmo está em `SPEED`, no script do fim do `index.html`. A timeline inteira é dividida por ele: aumentar acelera, diminuir desacelera. Hoje `1.265`.
-- O logo da cortina é o **mesmo mark do header**, com os mesmos paths e hexas. É isso que faz o voo pousar no pixel exato da nav (verificado: desvio 0 em x, y, largura e altura).
+- O zoom é feito **na página**, não na logo: ela nasce ampliada na escala exata que faz a logo da nav coincidir com a logo grande (verificado: desvio 0 em x, y, largura e altura). Por isso a troca de uma cópia pela outra é invisível, e por isso a logo chega ao canto sem parecer que andou.
+- Um único valor manda na onda: ele define o raio do círculo, o anel na borda desse círculo e a escala da página. Logo, onda e abertura ficam concêntricos o tempo todo.
 - Se a animação falhar por qualquer motivo, um vigia tira a cortina em 9s e a página aparece.
 
 ## Verificação
