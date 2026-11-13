@@ -384,7 +384,7 @@ INTRO = """<script>
     window.bylineIntro.seek(T.zoom + Math.round(T.zoomDur * .5));
     setTimeout(function(){
       var pg=document.getElementById("page"), cs=getComputedStyle(pg);
-      var m=cs.transform.match(/matrix\(([-\d.]+), 0, 0, ([-\d.]+), ([-\d.]+), ([-\d.]+)\)/);
+      var m=cs.transform.match(/matrix\\(([-\\d.]+), 0, 0, ([-\\d.]+), ([-\\d.]+), ([-\\d.]+)\\)/);
       if (m) {
         var k=+m[2], tx=+m[3], nv1=document.querySelector(".top .brand").getBoundingClientRect();
         out.midErrL=Math.round(nv1.left-(nv0.left*k+tx));
@@ -401,10 +401,21 @@ INTRO = """<script>
       out.ringOff=Math.round(Math.abs((rg.left+rg.width/2)-(st.left+st.width/2)));
       window.bylineIntro.seek(T.zoom + T.zoomDur);
       setTimeout(function(){
-        var pg=document.getElementById("page");
-        out.endTransform=getComputedStyle(pg).transform;
-        out.endClip=(getComputedStyle(pg).clipPath||"none").slice(0,46);
+        var pg=document.getElementById("page"), cs=getComputedStyle(pg);
+        out.endTransform=cs.transform;
+        out.endClip=(cs.clipPath||"none").slice(0,46);
         out.endNav=getComputedStyle(document.querySelector(".top .brand")).visibility;
+        // the real invariant is coverage, not a remembered radius: whatever the viewport and
+        // wherever the wave was born, the aperture has to reach every corner of it
+        var mm=(cs.transform||"").match(/matrix\\(([-\\d.]+), 0, 0, ([-\\d.]+), ([-\\d.]+), ([-\\d.]+)\\)/);
+        var kk=mm?+mm[2]:1, ttx=mm?+mm[3]:0, tty=mm?+mm[4]:0;
+        var cm=(cs.clipPath||"").match(/circle\\(([\\d.]+)px at ([\\d.]+)px ([\\d.]+)px\\)/);
+        if(cm){
+          var rr=+cm[1]*kk, ccx=ttx+(+cm[2])*kk, ccy=tty+(+cm[3])*kk;
+          out.coverSlack=Math.round(rr-Math.max(Math.hypot(ccx,ccy),Math.hypot(innerWidth-ccx,ccy),
+                                                Math.hypot(ccx,innerHeight-ccy),
+                                                Math.hypot(innerWidth-ccx,innerHeight-ccy)));
+        }
         window.bylineIntro.skip();
         setTimeout(after,300);
       }, 170);
@@ -424,6 +435,8 @@ INTRO = """<script>
 f = tmp / "intro.html"
 f.write_text(html.replace("</body>", INTRO + "</body>"), encoding="utf-8")
 out = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--virtual-time-budget=14000",
+                      "--run-all-compositor-stages-before-draw",
+                      f"--screenshot={tmp / 'intro.png'}",   # forces frames, so the intro's rAF fires
                       "--window-size=1440,900", "--dump-dom", f.as_uri()],
                      capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
 m = re.search(r"<title>INTRO\|([^<]*)</title>", out)
@@ -456,9 +469,10 @@ if m:
     chk("the page ends at its natural scale",
         (d.get("endTransform") or "").replace(" ", "") in ("matrix(1,0,0,1,0,0)", "none"),
         d.get("endTransform"))
+    slack = d.get("coverSlack")
     chk("by the end the aperture has swallowed the screen",
-        re.search(r"circle\((1[5-9]\d\d|2\d\d\d)(\.\d+)?px", d.get("endClip") or "")
-        is not None, d.get("endClip"))
+        slack is not None and slack.lstrip("-").isdigit() and int(slack) >= 0,
+        f"{d.get('endClip')} slack={slack}")
     # the visibility swap runs on a timer, which a paused timeline cannot drive: covered by afterNav
     chk("skip reveals the page", d.get("afterIntro") == "false" and d.get("afterClip") == "none", d.get("afterClip"))
     chk("skip un-hides the nav logo", d.get("afterNav") == "visible", d.get("afterNav"))

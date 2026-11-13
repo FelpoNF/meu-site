@@ -343,14 +343,17 @@ html.intro .top{position:static}               /* sticky inside a scaled ancesto
 .stage .brand-mark path{transition:none}       /* the intro owns these transforms */
 .stage .shelf{transform-box:fill-box;transform-origin:50% 50%}
 .stage .brand-word{will-change:clip-path,transform}
-.ring{--ring:conic-gradient(from 90deg at 50% 50%,var(--cobalt) 0deg,var(--sky) 24deg,var(--saffron) 50deg,var(--tomato) 76deg,var(--cobalt) 100deg,var(--cobalt) 360deg);
+/* --ring-w is the band's thickness at full size. The element is scaled by rs/rMax, so the band
+   thickens as the aperture crosses the screen: it is a hairline at the logo and a bold wave by
+   the time it reaches the corner, which is where it has to be noticed. */
+.ring{--ring:conic-gradient(from 90deg at 50% 50%,var(--cobalt) 0deg,var(--sky) 24deg,var(--saffron) 50deg,var(--tomato) 76deg,var(--cobalt) 100deg,var(--cobalt) 360deg);--ring-w:18px;
   position:fixed;left:0;top:0;z-index:25;width:0;height:0;border-radius:50%;transform-origin:50% 50%;opacity:0;pointer-events:none;
   background:var(--ring);
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4.5px));
-  mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4.5px))}
-.ring::after{content:"";position:absolute;inset:18px;border-radius:50%;background:var(--ring);
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px));
-  mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px))}
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - var(--ring-w)),#000 calc(100% - var(--ring-w) + .5px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - var(--ring-w)),#000 calc(100% - var(--ring-w) + .5px))}
+.ring::after{content:"";position:absolute;inset:calc(var(--ring-w) * 1.5);border-radius:50%;background:var(--ring);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - var(--ring-w) * .34),#000 calc(100% - var(--ring-w) * .34 + .5px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - var(--ring-w) * .34),#000 calc(100% - var(--ring-w) * .34 + .5px))}
 </style>
 <script>
 /* Intro curtain. The class has to land before the first paint or the page flashes,
@@ -1021,10 +1024,10 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     root.classList.add("intro");
 
     // timeline in ms, divided by the pace that was signed off
-    // zoomDur is the wave's own length: it is deliberately far longer than the rest of
-    // the beats so the site grows out of the logo instead of bursting out of it
+    // zoomDur is the wave's own length: long enough for the ring to be read as the thing that
+    // opens the page, short enough that the wait never feels like a loading screen
     const T = { shelf: 150, shelfDur: 650, book0: 700, bookGap: 260, bookDur: 850,
-                word: 2900, wordDur: 1000, hold: 180, zoomDur: 2600 };
+                word: 2900, wordDur: 1000, hold: 180, zoomDur: 1900 };
     T.zoom = T.word + T.wordDur + T.hold;      // the wave leaves the moment the name finishes
     const SPEED = 1.265;
     for (const k in T) T[k] = Math.round(T[k] / SPEED);
@@ -1043,7 +1046,14 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     const cxP = to.left + to.width / 2;    // the nav logo's centre, in page coordinates
     const cyP = to.top + to.height / 2;
     const rStart = from.width / 2;         // the wave starts as wide as the logo
-    const rMax = Math.hypot(innerWidth, innerHeight) + 80;
+    // the aperture only has to reach the far corner of the viewport as seen from where the wave
+    // is born. The full diagonal over-reaches from a corner origin, and every pixel of that
+    // over-reach is dead air the ring spends already off screen.
+    const farCorner = (x, y) => Math.max(Math.hypot(x, y), Math.hypot(innerWidth - x, y),
+                                         Math.hypot(x, innerHeight - y),
+                                         Math.hypot(innerWidth - x, innerHeight - y));
+    const rMax = Math.max(farCorner(from.left + from.width / 2, from.top + from.height / 2),
+                          farCorner(cxP, cyP)) + 24;
 
     // 1 · the shelf draws itself in
     A(shelf, [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
@@ -1072,23 +1082,25 @@ if (!reduceMotion && "IntersectionObserver" in window) {
       { delay: T.word, duration: T.wordDur, easing: ease3 });
 
     // 4 · the wave: the frame recedes from the logo and the site comes out of it
-    //     one value drives it all — the aperture, the ring on its edge, and the scale of the
-    //     page — so logo, wave and hole stay concentric while the logo walks to the nav slot
-    const N = 16, easeOut = p => 1 - Math.pow(1 - p, 3);
+    //     the hole opens at a steady radius and the page's own zoom eases, so the ring — which
+    //     is the aperture's edge — keeps crossing the screen for the whole beat instead of
+    //     racing past the far corner halfway through and leaving the rest blank
+    const N = 24;
+    const easeCam = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;   // the page's zoom
     const pageKf = [], ringKf = [];
     ring.style.width = ring.style.height = (rMax * 2) + "px";   // sized once, only transforms after
     for (let i = 0; i <= N; i++) {
-      const p = i / N, u = easeOut(p);
+      const p = i / N, u = easeCam(p);
       const k = k0 + (1 - k0) * u;
       const dx = tx * (1 - u), dy = ty * (1 - u);
-      const rs = rStart + (rMax - rStart) * easeOut(p);          // aperture radius, on screen
+      const rs = rStart + (rMax - rStart) * p;                   // aperture radius, on screen
       pageKf.push({ offset: p,
         transform: `translate(${dx.toFixed(2)}px,${dy.toFixed(2)}px) scale(${k.toFixed(4)})`,
         clipPath: `circle(${(rs / k).toFixed(1)}px at ${cxP.toFixed(1)}px ${cyP.toFixed(1)}px)` });
       const scx = dx + cxP * k, scy = dy + cyP * k;              // where that centre lands on screen
       ringKf.push({ offset: p,
         transform: `translate(${(scx - rMax).toFixed(2)}px,${(scy - rMax).toFixed(2)}px) scale(${(rs / rMax).toFixed(4)})`,
-        opacity: p < .72 ? .95 : Math.max(0, .95 * (1 - (p - .72) / .28)) });
+        opacity: 1 });                                           // the ring leaves by the far corner, not by fade
     }
 
     // the swap is invisible only because, for a few frames, these two logos are the same pixels:

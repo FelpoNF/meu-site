@@ -11,7 +11,7 @@ Página única do estúdio que produz produtos digitais sob medida a partir do c
 | `og-image.png` | 1200×630 — o cartão que aparece quando alguém compartilha o link |
 | `favicon.svg` | ícone da aba (os cinco livros, fundo transparente, 675 bytes) |
 | `apple-touch-icon.png` | 180×180 — ícone do atalho na tela inicial do iPhone (iOS ignora transparência, por isso tem fundo `#F2F4F7`) |
-| `verify.py` | verificação de desenvolvimento (144 checagens em Chrome headless); não precisa ir para o servidor |
+| `verify.py` | verificação de desenvolvimento (170 checagens em Chrome headless); não precisa ir para o servidor |
 | `preview-desktop.png` / `preview-mobile.png` | primeira tela em 1440×900 e 500×800 (não precisam ir para o servidor) |
 | `preview-finale.png` | a seção amarela com o calendário, 1440×520 |
 
@@ -51,7 +51,10 @@ A primeira carga de cada sessão abre com uma cortina: a prateleira se desenha, 
 - Quem configurou `prefers-reduced-motion` não vê nada: a página abre normal, sem cortina.
 - O ritmo está em `SPEED`, no script do fim do `index.html`. A timeline inteira é dividida por ele: aumentar acelera, diminuir desacelera. Hoje `1.265`.
 - O zoom é feito **na página**, não na logo: ela nasce ampliada na escala exata que faz a logo da nav coincidir com a logo grande (verificado: desvio 0 em x, y, largura e altura). Por isso a troca de uma cópia pela outra é invisível, e por isso a logo chega ao canto sem parecer que andou.
-- Um único valor manda na onda: ele define o raio do círculo, o anel na borda desse círculo e a escala da página. Logo, onda e abertura ficam concêntricos o tempo todo.
+- O raio da abertura cresce **linear no tempo** e a escala da página usa `easeCam` (entra e sai devagar). São curvas separadas de propósito: o anel é a borda da abertura, então é o raio linear que mantém o anel atravessando a tela durante toda a abertura. Com o `easeOut³` antigo ele entregava 88% da distância na primeira metade e sumia no canto, deixando a segunda metade sem anel.
+- `rMax` é a distância até o canto mais longe do viewport **medida a partir de onde a onda nasce**, mais 24px. A diagonal inteira (`hypot(w,h)`) exagerava a partir de uma origem no canto: o excedente era tempo com o anel já fora da tela.
+- A espessura do anel vem de `--ring-w` (18px no tamanho cheio). Como o elemento é escalado por `rs/rMax`, a faixa engrossa conforme atravessa a tela: ~5px ao nascer junto da logo, 18px no canto. O anel não tem fade: ele sai pela borda da tela no último quadro.
+- Um único valor manda na onda: ele define o raio do círculo, o anel na borda desse círculo e o centro da abertura. Logo, onda e abertura ficam concêntricos o tempo todo.
 - Se a animação falhar por qualquer motivo, um vigia tira a cortina em 9s e a página aparece.
 
 ## Verificação
@@ -62,7 +65,7 @@ Não existe build nem framework de teste: a página é um HTML estático com CSS
 python3 verify.py
 ```
 
-144 checagens: marca e logo, hero em 2 linhas e 90svh em sete larguras, os 3 passos, acordeão do FAQ (uma resposta aberta por vez), simetria do FAQ, faixa de 7 segmentos, botão do WhatsApp, ícone da aba, calendário desenhado, overflow e erros de JS. Sai com `0` quando tudo passa e `1` quando algo falha; em caso de falha os arquivos de probe ficam em `%TEMP%` para inspeção.
+170 checagens: marca e logo, hero em 2 linhas e 90svh em sete larguras, os 3 passos, acordeão do FAQ (uma resposta aberta por vez), simetria do FAQ, faixa de 7 segmentos, botão do WhatsApp, ícone da aba, calendário desenhado, overflow e erros de JS — mais a intro inteira medida no navegador: cortina no primeiro paint, logo grande e logo da nav coincidindo pixel a pixel no início da onda, anel concêntrico, escala natural no fim, abertura cobrindo todos os cantos do viewport, `skip`, `prefers-reduced-motion` e a marcação da sessão. Sai com `0` quando tudo passa e `1` quando algo falha; em caso de falha os arquivos de probe ficam em `%TEMP%` para inspeção.
 
 Precisa de Python 3 e Chrome (o `CHROME_PATH` resolve se o Chrome estiver fora do padrão). Se o `node` existir, ele também valida a sintaxe dos scripts inline; sem node essa checagem é pulada e o script diz isso.
 
