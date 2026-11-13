@@ -113,7 +113,7 @@ const gapL=Math.round(fl.getBoundingClientRect().left-wr.left);
 const gapR=Math.round(wr.right-fl.getBoundingClientRect().right);
 const aligned=gapL===gapR?1:0;
 document.title=[document.documentElement.clientWidth,lis.length,lefts.join(","),
-[...document.querySelectorAll("body *")].filter(e=>e.getBoundingClientRect().right>document.documentElement.clientWidth+1).length,
+[...document.querySelectorAll("body *")].filter(e=>!e.closest("#stage,#ring,.veil")&&e.getBoundingClientRect().right>document.documentElement.clientWidth+1).length,
 E.length,document.querySelectorAll(".spine").length,
 document.querySelector("[data-primary]").textContent.trim(),gap,aligned,gapL,h1lines,h1fs,heroPct,
 document.querySelectorAll(".cal-day").length,
@@ -162,8 +162,9 @@ chk("colour ribbon is back above the footer",
 chk("logo lockup is the big one", "font-size:1.9rem" in html and "brand:hover .brand-mark" not in html)
 chk("hover targets books, not the svg",
     '.brand-mark path{transform-box:fill-box' in html and 'link.addEventListener("mousemove"' in html)
-chk("new logo is in the header",
-    html.count('class="brand-mark"') == 1 and html.count('fill="#8FC1E8"') == 1 and 'class="mark"' not in html)
+chk("logo is the five-book mark, header and stage copies only",
+    html.count('class="brand-mark"') == 2 and html.count('fill="#8FC1E8"') == 2
+    and 'class="mark"' not in html and html.index('class="brand-mark"') < html.index('<header class="top"'))
 _mark = html[html.index('class="brand-mark"'):]
 _mark = _mark[:_mark.index('</svg>')]
 _fills = re.findall(r'<path[^>]*fill="(#[0-9A-Fa-f]{6})"', _mark)
@@ -276,7 +277,7 @@ else:
 
 # --- logo hover: shelf still, books rise by proximity ---
 HOV = """<script>window.addEventListener("load",function(){setTimeout(function(){
-var mark=document.querySelector(".brand-mark"), link=document.querySelector(".brand");
+var mark=document.querySelector(".top .brand-mark"), link=document.querySelector(".top .brand");
 var books=[].slice.call(mark.querySelectorAll("path")), shelf=mark.querySelector("rect");
 var t=books[1].getBoundingClientRect(), x=t.left+t.width/2;
 link.dispatchEvent(new MouseEvent("mousemove",{bubbles:true,clientX:x,clientY:200}));
@@ -332,6 +333,111 @@ if m:
     chk("faq: clicking the open one closes it", c == "0", c)
 else:
     chk("faq accordion probe ran", False, "no output")
+
+
+# --- intro: curtain before paint, exact landing, escape hatch, reduced motion ---
+chk("intro curtain is armed in the head",
+    'sessionStorage.getItem("byline-intro")' in html and 'd.classList.add("intro")' in html
+    and html.index('sessionStorage.getItem("byline-intro")') < html.index("<body>"))
+chk("no intro on the privacy page", 'id="stage"' not in priv and "byline-intro" not in priv)
+chk("stage repeats the header's five books, not a second drawing",
+    html.count('fill="#2E3A55"') == 2 and html.count("data-fall=") == 5)
+chk("intro speaks the site palette", "2F60E3" not in html.upper() and "F5A623" not in html.upper())
+
+INTRO = """<script>
+(function(){
+  var out={}, t0=Date.now(), done=false;
+  function read(){
+    var st=document.querySelector("#stage .brand"), nv=document.querySelector(".top .brand");
+    var sr=st.getBoundingClientRect(), nr=nv.getBoundingClientRect(), pg=document.getElementById("page");
+    out.intro=document.documentElement.classList.contains("intro");
+    out.stageH=Math.round(sr.height);
+    out.ratio=(sr.width/sr.height).toFixed(3);
+    out.navRatio=(nr.width/nr.height).toFixed(3);
+    out.navHidden=getComputedStyle(nv).visibility;
+    var mk=st.querySelector(".brand-mark").getBoundingClientRect();
+    var sg=document.getElementById("stage").getBoundingClientRect();   // the stage is the visible box
+    out.iconOff=Math.round(Math.abs((mk.left+mk.width/2)-(sg.left+sg.width/2)));
+    out.word=getComputedStyle(st.querySelector(".bw-st")).color;
+    out.clip=getComputedStyle(pg).clipPath||"none";
+    out.inert=!!pg.inert;
+  }
+  function after(){
+    if(done) return; done=true;
+    var pg=document.getElementById("page");
+    out.afterIntro=document.documentElement.classList.contains("intro");
+    out.afterClip=getComputedStyle(pg).clipPath||"none";
+    out.afterNav=getComputedStyle(document.querySelector(".top .brand")).visibility;
+    out.afterInert=!!pg.inert;
+    out.stored=sessionStorage.getItem("byline-intro");
+    var kv=[]; for(var k in out) kv.push(k+"="+out[k]);
+    document.title="INTRO|"+kv.join(";");
+  }
+  function landing(){
+    var st=document.querySelector("#stage .brand").getBoundingClientRect();
+    var nv=document.querySelector(".top .brand").getBoundingClientRect();
+    out.dLeft=Math.round(st.left-nv.left); out.dTop=Math.round(st.top-nv.top);
+    out.dW=Math.round(st.width-nv.width); out.dH=Math.round(st.height-nv.height);
+  }
+  (function wait(){
+    if(window.bylineIntro&&window.bylineIntro.ready){
+      read();
+      window.bylineIntro.seek(4500);            // past the flight: where does it actually end up?
+      setTimeout(function(){ landing(); window.bylineIntro.skip(); setTimeout(after,300); }, 160);
+      return;
+    }
+    if(Date.now()-t0>6000){ out.error="intro never became ready"; after(); return; }
+    setTimeout(wait,50);
+  })();
+})();
+</script>"""
+f = tmp / "intro.html"
+f.write_text(html.replace("</body>", INTRO + "</body>"), encoding="utf-8")
+out = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--virtual-time-budget=14000",
+                      "--window-size=1440,900", "--dump-dom", f.as_uri()],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
+m = re.search(r"<title>INTRO\|([^<]*)</title>", out)
+if m:
+    d = dict(kv.split("=", 1) for kv in m.group(1).split(";") if "=" in kv)
+    chk("curtain is up on a first load", d.get("intro") == "true", d.get("error", ""))
+    chk("stage lockup is big", d.get("stageH", "0").isdigit() and int(d.get("stageH", 0)) >= 100, d.get("stageH"))
+    chk("stage and nav lockups share proportions (landing cannot distort)",
+        abs(float(d.get("ratio", 0)) - float(d.get("navRatio", 1))) <= 0.01,
+        f"{d.get('ratio')} vs {d.get('navRatio')}")
+    chk("nav logo waits for the flight", d.get("navHidden") == "hidden", d.get("navHidden"))
+    chk("the icon sits centred while it is alone on screen",
+        d.get("iconOff", "999").isdigit() and int(d.get("iconOff", 999)) <= 2, f"{d.get('iconOff')}px off")
+    chk("intro wordmark paints the cobalt", d.get("word") == "rgb(43, 78, 255)", d.get("word"))
+    chk("page starts clipped to the corner", d.get("clip", "none").startswith("circle(0px"), d.get("clip"))
+    chk("page is inert behind the curtain", d.get("inert") == "true", d.get("inert"))
+    chk("the flight lands exactly on the nav slot",
+        all(d.get(k, "99").lstrip("-").isdigit() and abs(int(d.get(k, 99))) <= 1
+            for k in ("dLeft", "dTop", "dW", "dH")),
+        f"dx={d.get('dLeft')} dy={d.get('dTop')} dw={d.get('dW')} dh={d.get('dH')}")
+    chk("skip reveals the page", d.get("afterIntro") == "false" and d.get("afterClip") == "none", d.get("afterClip"))
+    chk("skip un-hides the nav logo", d.get("afterNav") == "visible", d.get("afterNav"))
+    chk("skip makes the page focusable again", d.get("afterInert") == "false", d.get("afterInert"))
+    chk("the session is marked as seen", d.get("stored") == "1", d.get("stored"))
+else:
+    chk("intro probe ran", False, "no title")
+
+RM = """<script>window.addEventListener("load",function(){setTimeout(function(){
+var d=document.documentElement, pg=document.getElementById("page");
+document.title="RM|"+d.classList.contains("intro")+"|"+(getComputedStyle(pg).clipPath||"none")+"|"+
+getComputedStyle(document.querySelector(".top .brand")).visibility+"|"+!!window.bylineIntro;},400);});</script>"""
+frm = tmp / "intro-rm.html"
+frm.write_text(html.replace("</body>", RM + "</body>"), encoding="utf-8")
+out = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--force-prefers-reduced-motion",
+                      "--virtual-time-budget=6000", "--window-size=1440,900", "--dump-dom", frm.as_uri()],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
+m = re.search(r"<title>RM\|(\w+)\|([^|]*)\|(\w+)\|(\w+)</title>", out)
+if m:
+    rm_intro, rm_clip, rm_nav, rm_hook = m.groups()
+    chk("reduced motion: no curtain at all", rm_intro == "false" and rm_clip == "none", f"{rm_intro}/{rm_clip}")
+    chk("reduced motion: nav logo is just there", rm_nav == "visible", rm_nav)
+    chk("reduced motion: hook still defined", rm_hook == "true", rm_hook)
+else:
+    chk("reduced motion probe ran", False, "no title")
 
 print(f"\n{ok} passed, {fail} failed")
 if fail:

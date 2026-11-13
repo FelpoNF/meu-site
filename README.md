@@ -42,6 +42,17 @@ Sem o parâmetro, a página abre no primeiro formato.
 2. Se ficar em subpasta, troque `content="og-image.png"` por `content="https://seudominio.com/og-image.png"` — alguns previews exigem URL absoluta.
 3. A página está com `noindex, nofollow`: não aparece em busca. Se quiser que apareça, apague essa linha; é a única mudança necessária.
 
+## A intro
+
+A primeira carga de cada sessão abre com uma cortina: a prateleira se desenha, os cinco livros caem, o nome sai de trás do ícone, o logo voa para o canto da nav e a página se abre num círculo que sai dali.
+
+- Roda **uma vez por sessão** (`sessionStorage`, chave `byline-intro`). Recarregar na mesma aba não repete; aba nova ou anônima repete.
+- Qualquer clique na tela, `Esc` ou `Espaço` pula direto para a página.
+- Quem configurou `prefers-reduced-motion` não vê nada: a página abre normal, sem cortina.
+- O ritmo está em `SPEED`, no script do fim do `index.html`. A timeline inteira é dividida por ele: aumentar acelera, diminuir desacelera. Hoje `1.265`.
+- O logo da cortina é o **mesmo mark do header**, com os mesmos paths e hexas. É isso que faz o voo pousar no pixel exato da nav (verificado: desvio 0 em x, y, largura e altura).
+- Se a animação falhar por qualquer motivo, um vigia tira a cortina em 9s e a página aparece.
+
 ## Verificação
 
 Não existe build nem framework de teste: a página é um HTML estático com CSS e JS inline. O `verify.py` é a suíte que existe — ele abre a página num Chrome headless de verdade e mede o que foi renderizado, em vez de confiar no código-fonte.
