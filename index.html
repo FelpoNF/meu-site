@@ -1021,8 +1021,10 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     root.classList.add("intro");
 
     // timeline in ms, divided by the pace that was signed off
+    // zoomDur is the wave's own length: it is deliberately far longer than the rest of
+    // the beats so the site grows out of the logo instead of bursting out of it
     const T = { shelf: 150, shelfDur: 650, book0: 700, bookGap: 260, bookDur: 850,
-                word: 2900, wordDur: 1000, hold: 180, zoomDur: 1350 };
+                word: 2900, wordDur: 1000, hold: 180, zoomDur: 2600 };
     T.zoom = T.word + T.wordDur + T.hold;      // the wave leaves the moment the name finishes
     const SPEED = 1.265;
     for (const k in T) T[k] = Math.round(T[k] / SPEED);
