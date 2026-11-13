@@ -435,8 +435,6 @@ INTRO = """<script>
 f = tmp / "intro.html"
 f.write_text(html.replace("</body>", INTRO + "</body>"), encoding="utf-8")
 out = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--virtual-time-budget=14000",
-                      "--run-all-compositor-stages-before-draw",
-                      f"--screenshot={tmp / 'intro.png'}",   # forces frames, so the intro's rAF fires
                       "--window-size=1440,900", "--dump-dom", f.as_uri()],
                      capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
 m = re.search(r"<title>INTRO\|([^<]*)</title>", out)

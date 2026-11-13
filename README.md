@@ -55,7 +55,7 @@ A primeira carga de cada sessão abre com uma cortina: a prateleira se desenha, 
 - `rMax` é a distância até o canto mais longe do viewport **medida a partir de onde a onda nasce**, mais 24px. A diagonal inteira (`hypot(w,h)`) exagerava a partir de uma origem no canto: o excedente era tempo com o anel já fora da tela.
 - A espessura do anel vem de `--ring-w` (18px no tamanho cheio). Como o elemento é escalado por `rs/rMax`, a faixa engrossa conforme atravessa a tela: ~5px ao nascer junto da logo, 18px no canto. O anel não tem fade: ele sai pela borda da tela no último quadro.
 - Um único valor manda na onda: ele define o raio do círculo, o anel na borda desse círculo e o centro da abertura. Logo, onda e abertura ficam concêntricos o tempo todo.
-- Se a animação falhar por qualquer motivo, um vigia tira a cortina em 9s e a página aparece.
+- A cortina é montada numa **tarefa** (`setTimeout`), não num `requestAnimationFrame`. Em aba de fundo, e sob tempo virtual em headless, o rAF registrado tarde nunca é chamado: a cortina ficaria de pé até o vigia. Se ainda assim algo falhar, um vigia tira a cortina em 9s e a página aparece.
 
 ## Verificação
 

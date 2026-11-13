@@ -1137,10 +1137,12 @@ if (!reduceMotion && "IntersectionObserver" in window) {
   const fonts = document.fonts
     ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1200))])
     : Promise.resolve();
-  fonts.then(() => requestAnimationFrame(() => {
+  // a task, not a frame: a rAF registered this late is never called in a background tab or
+  // under a virtual-time harness, and the curtain would sit there until the 9s watchdog fired
+  fonts.then(() => setTimeout(() => {
     try { play(); } catch (e) { finish(); }
     window.bylineIntro.ready = true;
-  }));
+  }, 0));
 })();
 </script>
 </body>
