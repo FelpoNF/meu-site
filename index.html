@@ -1027,7 +1027,7 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     // zoomDur is the wave's own length: long enough for the ring to be read as the thing that
     // opens the page, short enough that the wait never feels like a loading screen
     const T = { shelf: 150, shelfDur: 650, book0: 700, bookGap: 260, bookDur: 850,
-                word: 2900, wordDur: 1000, hold: 180, zoomDur: 1900 };
+                word: 2900, wordDur: 1000, hold: 180, zoomDur: 1650 };
     T.zoom = T.word + T.wordDur + T.hold;      // the wave leaves the moment the name finishes
     const SPEED = 1.265;
     for (const k in T) T[k] = Math.round(T[k] / SPEED);
@@ -1100,7 +1100,7 @@ if (!reduceMotion && "IntersectionObserver" in window) {
       const scx = dx + cxP * k, scy = dy + cyP * k;              // where that centre lands on screen
       ringKf.push({ offset: p,
         transform: `translate(${(scx - rMax).toFixed(2)}px,${(scy - rMax).toFixed(2)}px) scale(${(rs / rMax).toFixed(4)})`,
-        opacity: 1 });                                           // the ring leaves by the far corner, not by fade
+        opacity: .95 });                                         // the ring leaves by the far corner, not by fade
     }
 
     // the swap is invisible only because, for a few frames, these two logos are the same pixels:
