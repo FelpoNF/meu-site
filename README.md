@@ -11,7 +11,7 @@ Página única do estúdio que produz produtos digitais sob medida a partir do c
 | `og-image.png` | 1200×630 — o cartão que aparece quando alguém compartilha o link |
 | `favicon.svg` | ícone da aba (os cinco livros, fundo transparente, 675 bytes) |
 | `apple-touch-icon.png` | 180×180 — ícone do atalho na tela inicial do iPhone (iOS ignora transparência, por isso tem fundo `#F2F4F7`) |
-| `verify.py` | verificação de desenvolvimento (170 checagens em Chrome headless); não precisa ir para o servidor |
+| `verify.py` | verificação de desenvolvimento (179 checagens em Chrome headless); não precisa ir para o servidor |
 | `preview-desktop.png` / `preview-mobile.png` | primeira tela em 1440×900 e 500×800 (não precisam ir para o servidor) |
 | `preview-finale.png` | a seção amarela com o calendário, 1440×520 |
 
@@ -65,7 +65,7 @@ Não existe build nem framework de teste: a página é um HTML estático com CSS
 python3 verify.py
 ```
 
-170 checagens: marca e logo, hero em 2 linhas e 90svh em sete larguras, os 3 passos, acordeão do FAQ (uma resposta aberta por vez), simetria do FAQ, faixa de 7 segmentos, botão do WhatsApp, ícone da aba, calendário desenhado, overflow e erros de JS — mais a intro inteira medida no navegador: cortina no primeiro paint, logo grande e logo da nav coincidindo pixel a pixel no início da onda, anel concêntrico, escala natural no fim, abertura cobrindo todos os cantos do viewport, `skip`, `prefers-reduced-motion` e a marcação da sessão. Sai com `0` quando tudo passa e `1` quando algo falha; em caso de falha os arquivos de probe ficam em `%TEMP%` para inspeção.
+179 checagens: marca e logo, hero em 2 linhas e 90svh em sete larguras, os 3 passos, acordeão do FAQ (uma resposta aberta por vez), simetria do FAQ, faixa de 7 segmentos, botão do WhatsApp, ícone da aba, calendário desenhado, overflow e erros de JS — mais a intro inteira medida no navegador: cortina no primeiro paint, logo grande e logo da nav coincidindo pixel a pixel no início da onda, anel concêntrico, escala natural no fim, abertura cobrindo todos os cantos do viewport, `skip`, `prefers-reduced-motion` e a marcação da sessão. O aro tem asserções próprias, todas medidas na timeline exposta: a onda dura o que a constante `zoomDur` e o divisor `SPEED` implicam, o beat inteiro é uma divisão de ritmo de ponta a ponta, o aro mantém uma única opacidade do começo ao fim (sai pelo canto, não por fade), está na tela na largada e na metade, a faixa engrossa até a espessura declarada em `--ring-w`, e nenhuma parte dela sobra em tela no último quadro. Sai com `0` quando tudo passa e `1` quando algo falha; em caso de falha os arquivos de probe ficam em `%TEMP%` para inspeção.
 
 Precisa de Python 3 e Chrome (o `CHROME_PATH` resolve se o Chrome estiver fora do padrão). Se o `node` existir, ele também valida a sintaxe dos scripts inline; sem node essa checagem é pulada e o script diz isso.
 

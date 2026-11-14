@@ -343,6 +343,11 @@ chk("no intro on the privacy page", 'id="stage"' not in priv and "byline-intro" 
 chk("stage repeats the header's five books, not a second drawing",
     html.count('fill="#2E3A55"') == 2 and html.count("data-fall=") == 5)
 chk("intro speaks the site palette", "2F60E3" not in html.upper() and "F5A623" not in html.upper())
+chk("the entry never waits on a frame (a rAF registered this late never runs in a background tab)",
+    html.count("requestAnimationFrame") == 0, f"{html.count('requestAnimationFrame')} mentions")
+# the band's thickness is measured through --ring-w, so the mask has to keep painting from it
+chk("the mask paints the band it declares, not a number of its own",
+    "-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - var(--ring-w))" in html)
 
 INTRO = """<script>
 (function(){
@@ -380,6 +385,22 @@ INTRO = """<script>
   // is the ring concentric with it, and does the page end at its natural scale?
   function wave(){
     var T = window.bylineIntro.timeline;
+    out.tZoom=T.zoom; out.tZoomDur=T.zoomDur;
+    // the ring is one element scaled from 0 to rMax*2, so its rect gives the aperture radius and
+    // the painted band is --ring-w * (rect.width / style.width), never rect.width
+    function rstate(tag){
+      var r=document.getElementById("ring"), rc=r.getBoundingClientRect(), cs=getComputedStyle(r);
+      var sw=parseFloat(r.style.width)||0, rw=parseFloat(cs.getPropertyValue("--ring-w"))||0;
+      var cx=rc.left+rc.width/2, cy=rc.top+rc.height/2, rad=rc.width/2, op=parseFloat(cs.opacity);
+      var band=sw?rw*(rc.width/sw):0;
+      var far=Math.max(Math.hypot(cx,cy),Math.hypot(innerWidth-cx,cy),
+                       Math.hypot(cx,innerHeight-cy),Math.hypot(innerWidth-cx,innerHeight-cy));
+      out[tag+"On"]=(rc.width>4&&rc.right>0&&rc.left<innerWidth&&rc.bottom>0&&rc.top<innerHeight&&op>.5)?1:0;
+      out[tag+"W"]=Math.round(rc.width);
+      out[tag+"Band"]=+band.toFixed(1);
+      out[tag+"Op"]=+op.toFixed(3);
+      out[tag+"Clear"]=Math.round(far-(rad-band));   // >0: the band is past every corner
+    }
     var nv0 = document.querySelector(".top .brand").getBoundingClientRect();
     window.bylineIntro.seek(T.zoom + Math.round(T.zoomDur * .5));
     setTimeout(function(){
@@ -416,8 +437,17 @@ INTRO = """<script>
                                                 Math.hypot(ccx,innerHeight-ccy),
                                                 Math.hypot(innerWidth-ccx,innerHeight-ccy)));
         }
-        window.bylineIntro.skip();
-        setTimeout(after,300);
+        // the ring read across the wave: one seek per sample, one task for styles to settle.
+        // Two seeks registered in the same task would let the earlier read see the later time.
+        // +1ms, not the delay boundary itself: exactly on it the animation can still report its
+        // base opacity, and the point here is the ring as it leaves, born as wide as the logo
+        var seq=[[T.zoom+1,"s"],[T.zoom+Math.round(T.zoomDur*.5),"m"],[T.zoom+T.zoomDur,"e"]], si=0;
+        (function sample(){
+          if(si>=seq.length){ window.bylineIntro.skip(); setTimeout(after,300); return; }
+          var at=seq[si][0], tag=seq[si][1]; si++;
+          window.bylineIntro.seek(at);
+          setTimeout(function(){ rstate(tag); sample(); }, 170);
+        })();
       }, 170);
     }, 170);
   }
@@ -476,6 +506,46 @@ if m:
     chk("skip un-hides the nav logo", d.get("afterNav") == "visible", d.get("afterNav"))
     chk("skip makes the page focusable again", d.get("afterInert") == "false", d.get("afterInert"))
     chk("the session is marked as seen", d.get("stored") == "1", d.get("stored"))
+    # --- the ring as the thing that opens the site: rhythm and read, off the same timeline ---
+    mzd = re.search(r"zoomDur:\s*(\d+)", html)
+    msp = re.search(r"const SPEED\s*=\s*([\d.]+)", html)
+    mrw = re.search(r"--ring-w:\s*([\d.]+)px", html)
+    mtt = re.search(r"const T = \{(.*?)\};", html, re.S)
+    if mzd and msp and mrw and mtt:
+        speed = float(msp.group(1))
+        raw = {k: int(v) for k, v in re.findall(r"(\w+):\s*(\d+)", mtt.group(1))}
+        raw_wave = int(mzd.group(1))
+        raw_beat = raw.get("word", 0) + raw.get("wordDur", 0) + raw.get("hold", 0) + raw_wave
+        want_dur, want_beat = round(raw_wave / speed), round(raw_beat / speed)
+        got_dur = int(d.get("tZoomDur", 0))
+        got_beat = int(d.get("tZoom", 0)) + got_dur
+        chk("the wave runs the length its own constant and the global pace imply",
+            got_dur == want_dur, f"{got_dur}ms on screen vs {want_dur}ms")
+        chk("the entry beat is one pace division end to end",
+            abs(got_beat - want_beat) <= 3, f"{got_beat}ms vs {want_beat}ms")
+        ops = [float(d.get(k, 0)) for k in ("sOp", "mOp", "eOp")]
+        chk("the ring keeps one opacity while it crosses: it leaves by the corner, not by a fade",
+            max(ops) - min(ops) <= 0.01 and ops[0] >= 0.9, " / ".join(str(o) for o in ops))
+        # Clear is how far the farthest viewport corner sits beyond the band's inner edge,
+        # so positive means the band still crosses the screen and negative means it has gone past it
+        chk("the ring is on screen when the wave starts",
+            d.get("sOn") == "1" and int(d.get("sClear", 0)) > 0,
+            f"{d.get('sW')}px wide, band {d.get('sBand')}px, opacity {d.get('sOp')}, "
+            f"farthest corner {d.get('sClear')}px beyond the band")
+        chk("the ring is still on screen halfway, wider than it started",
+            d.get("mOn") == "1" and int(d.get("mClear", 0)) > 0
+            and int(d.get("mW", 0)) > int(d.get("sW", 0)),
+            f"{d.get('mW')}px vs {d.get('sW')}px, corner {d.get('mClear')}px beyond the band")
+        chk("the band thickens as the aperture widens, and lands on --ring-w",
+            float(d.get("sBand", 0)) < float(d.get("mBand", 0)) < float(d.get("eBand", 0))
+            and abs(float(d.get("eBand", 0)) - float(mrw.group(1))) <= 1.5,
+            f"{d.get('sBand')} to {d.get('mBand')} to {d.get('eBand')}px, --ring-w {mrw.group(1)}px")
+        chk("the band leaves by the farthest corner, not by a fade",
+            int(d.get("eClear", 99)) <= 1,
+            f"{d.get('eClear')}px past the farthest corner, opacity {d.get('eOp')}")
+    else:
+        chk("ring and rhythm constants are readable from the page", False,
+            f"zoomDur={bool(mzd)} SPEED={bool(msp)} ring-w={bool(mrw)} T={bool(mtt)}")
 else:
     chk("intro probe ran", False, "no title")
 
