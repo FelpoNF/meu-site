@@ -576,8 +576,9 @@ else:
 DROP = """<script>
 var st=document.querySelector(".stack"), bs=[...document.querySelectorAll(".sbook")];
 function s(){var r=st.getBoundingClientRect();
-  return [st.classList.contains("land")?1:0, getComputedStyle(bs[0]).animationName,
-          Math.round(r.bottom-innerHeight)].join(",");}
+  var a=getComputedStyle(bs[0]), z=getComputedStyle(bs[bs.length-1]);
+  return [st.classList.contains("land")?1:0, a.animationName, Math.round(r.bottom-innerHeight),
+          a.opacity+"/"+(a.transform||"none"), z.opacity+"/"+(z.transform||"none")].join(";");}
 setTimeout(function(){
   var before=s();          // after the observer's own first entry has had a frame to arrive
   st.classList.add("land");
@@ -605,14 +606,15 @@ for w, h, expect in ((504, 800, "wait"), (760, 900, "drop"), (1440, 900, "deskto
         chk(f"stack drop probe at {w}px", False, "no title")
         continue
     p = m.group(1).split("|")
-    land0, anim0, below = p[0].split(",")
-    land1, anim1, _ = p[1].split(",")
+    land0, anim0, below, hide0, hideZ = p[0].split(";")
+    land1, anim1 = p[1].split(";")[:2]
     anims = p[2].split("=", 1)[1]
     rest, last, n = p[3].split("=", 1)[1], p[4].split("=", 1)[1], p[5].split("=", 1)[1]
-    seen = f"land={land0} anim={anim0} shelf {below}px from the fold"
+    hidden = all(v.startswith("0/") and v.rstrip(")").endswith("-80") for v in (hide0, hideZ))
+    seen = f"land={land0} anim={anim0} shelf {below}px from the fold, books {hide0} and {hideZ}"
     if expect == "wait":
-        chk("the books wait while their shelf is still below the fold",
-            land0 == "0" and anim0 == "none" and int(below) > 0, seen)
+        chk("the books stay off screen while their shelf is below the fold",
+            land0 == "0" and anim0 == "none" and int(below) > 0 and hidden, seen)
         chk("once the hold is lifted the six books land at rest",
             anim1 == "drop" and anims == "6" and rest == "1/none" and last == "1/none" and n == "6",
             f"{anim1}, {anims} animations, first {rest}, last {last}")
@@ -620,10 +622,11 @@ for w, h, expect in ((504, 800, "wait"), (760, 900, "drop"), (1440, 900, "deskto
         chk("a shelf that starts on screen is not made to wait",
             land0 == "1" and anim0 == "drop" and int(below) <= 0, seen)
     else:
-        chk("desktop keeps the drop at load, with no waiting class",
-            land0 == "0" and anim0 == "drop", seen)
+        chk("desktop keeps the drop at load, with the books on screen",
+            land0 == "0" and anim0 == "drop" and float(hide0.split("/")[0]) > 0.5, seen)
 chk("the wait is scoped to the narrow layout and keys on the shelf's edge",
-    "@media (max-width:960px){.stack:not(.land) .sbook{animation:none}}" in html
+    "@media (max-width:960px){.stack:not(.land) .sbook{animation:none;opacity:0;"
+    "transform:translateY(-80px)}}" in html
     and 'en.boundingClientRect.bottom > innerHeight + 1' in html
     and 'matchMedia("(max-width:960px)")' in html)
 chk("reduced motion and browsers without an observer land the books at once",

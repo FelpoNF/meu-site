@@ -138,8 +138,8 @@ h2{font-size:clamp(1.95rem,4vw,3.05rem);max-width:22ch}
 @media (max-width:430px){.sbook{height:40px;font-size:.86rem;width:calc(var(--w)*.88);margin-left:calc(var(--x)*.7)}}
 @keyframes drop{from{transform:translateY(-80px);opacity:0}}
 /* the stack waits for its own shelf: on narrow screens the ink bar starts below the fold, so the
-   books only drop once it is on screen, never onto a shelf the visitor has not seen yet */
-@media (max-width:960px){.stack:not(.land) .sbook{animation:none}}
+   books are kept off screen until it is there, then dropped onto it and left in place */
+@media (max-width:960px){.stack:not(.land) .sbook{animation:none;opacity:0;transform:translateY(-80px)}}
 
 /* ---------- short version ---------- */
 .short{background:var(--white);border-block:1px solid var(--line)}
