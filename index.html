@@ -137,6 +137,9 @@ h2{font-size:clamp(1.95rem,4vw,3.05rem);max-width:22ch}
 .sbook::after{content:"";position:absolute;right:0;top:5px;bottom:5px;width:15px;background:repeating-linear-gradient(0deg,#fff 0 2px,#DDE2EB 2px 3px);border-radius:0 2px 2px 0;opacity:.92}
 @media (max-width:430px){.sbook{height:40px;font-size:.86rem;width:calc(var(--w)*.88);margin-left:calc(var(--x)*.7)}}
 @keyframes drop{from{transform:translateY(-80px);opacity:0}}
+/* the stack waits for its own shelf: on narrow screens the ink bar starts below the fold, so the
+   books only drop once it is on screen, never onto a shelf the visitor has not seen yet */
+@media (max-width:960px){.stack:not(.land) .sbook{animation:none}}
 
 /* ---------- short version ---------- */
 .short{background:var(--white);border-block:1px solid var(--line)}
@@ -924,6 +927,27 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     io.observe(el);
   });
 }
+
+/* On a phone the stack sits under the CTAs and its shelf starts below the fold, so the drop used
+   to run before the visitor ever saw what the books land on: hold it until the whole stack, shelf
+   included, is on screen. Desktop keeps the load-time drop, which is already in view. */
+(function () {
+  const stack = document.querySelector(".stack");
+  if (!stack || !matchMedia("(max-width:960px)").matches) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+    stack.classList.add("land");          // nothing to choreograph: the books just sit there
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      // the .5 step is what catches a scroll that starts mid-stack; the bottom test is the claim
+      if (!en.isIntersecting || en.boundingClientRect.bottom > innerHeight + 1) return;
+      stack.classList.add("land");
+      io.disconnect();
+    });
+  }, { threshold: [0, .5, 1] });
+  io.observe(stack);
+})();
 </script>
 
 <script>
