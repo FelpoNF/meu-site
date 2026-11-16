@@ -95,7 +95,7 @@ Se alguma dessas não for verdade, me diga qual e eu reescrevo a seção — nã
 - **A estante é o sistema visual.** Os sete formatos são amostras de produto (cookbook, workbook, journal, guide), não trabalhos de clientes — o painel diz isso explicitamente.
 - **"Digital product" no posicionamento, "livro" no formato.** O hero fala de produto digital; os formatos mostram que o produto é um livro/workbook. Se um dia você fizer curso ou ferramenta, a estante continua servindo.
 - **Sem a moldura de convite.** Não há "prepared for [nome]", nem "you got our email", nem `?name=`. A página se sustenta sozinha em qualquer origem de tráfego.
-- **No celular a pilha do hero espera a estante.** Abaixo de 960px a estante de tinta começa fora da tela; os seis livros ficam invisíveis (`.stack:not(.land)`) até a estante inteira entrar no viewport, e só então caem e ficam. No desktop nada muda: caem no load, como sempre.
+- **Os livros do hero esperam a vez.** Ficam invisíveis (`.stack:not(.land)`) até a cortina terminar, e no celular até a estante de tinta entrar no viewport também; aí caem e ficam. A liberação é o evento `byline:entry-end`, disparado no `finish()` da intro e no caminho "sem cortina" (sessão já vista ou reduced motion). Sem cortina, caem no load; `prefers-reduced-motion` não espera nada.
 
 ## Pendências suas
 

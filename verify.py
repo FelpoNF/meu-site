@@ -622,15 +622,50 @@ for w, h, expect in ((504, 800, "wait"), (760, 900, "drop"), (1440, 900, "deskto
         chk("a shelf that starts on screen is not made to wait",
             land0 == "1" and anim0 == "drop" and int(below) <= 0, seen)
     else:
-        chk("desktop keeps the drop at load, with the books on screen",
-            land0 == "0" and anim0 == "drop" and float(hide0.split("/")[0]) > 0.5, seen)
-chk("the wait is scoped to the narrow layout and keys on the shelf's edge",
-    "@media (max-width:960px){.stack:not(.land) .sbook{animation:none;opacity:0;"
-    "transform:translateY(-80px)}}" in html
-    and 'en.boundingClientRect.bottom > innerHeight + 1' in html
+        chk("desktop with no curtain does not wait either",
+            land0 == "1" and anim0 == "drop" and float(hide0.split("/")[0]) > 0.2, seen)
+chk("the hold spans every width and is released by the entry's own event",
+    ".stack:not(.land) .sbook{animation:none;opacity:0;transform:translateY(-80px)}" in html
+    and 'document.addEventListener("byline:entry-end"' in html
+    and 'document.dispatchEvent(new Event("byline:entry-end"))' in html)
+chk("on a phone the shelf still has to be on screen as well",
+    'en.boundingClientRect.bottom > innerHeight + 1' in html
     and 'matchMedia("(max-width:960px)")' in html)
-chk("reduced motion and browsers without an observer land the books at once",
-    'matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)' in html)
+chk("reduced motion skips the hold, and a missing observer never holds the books",
+    'if (matchMedia("(prefers-reduced-motion: reduce)").matches) { stack.classList.add("land"); return; }' in html
+    and "never hold the books hostage" in html)
+
+# --- the entry owns the drop: nothing falls until the curtain is gone ---
+ENT = """<script>
+function e(){var st=document.querySelector(".stack"), b=document.querySelector(".sbook");
+  var cs=getComputedStyle(b), r=st.getBoundingClientRect();
+  return [document.documentElement.classList.contains("intro")?1:0,
+          st.classList.contains("land")?1:0, cs.animationName, cs.opacity,
+          Math.round(r.bottom-innerHeight)].join(";");}
+var first="pending";
+setTimeout(function(){ first=e(); }, 1200);
+setTimeout(function(){ document.title="ENT|"+first+"|"+e(); }, 9000);
+</script>"""
+ef = tmp / "entry.html"
+ef.write_text(html.replace("</body>", ENT + "</body>"), encoding="utf-8")
+for w, h, expect in ((1440, 900, "desktop"), (504, 800, "phone")):
+    out = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--virtual-time-budget=12000",
+                          f"--window-size={w},{h}", "--dump-dom", ef.as_uri()],
+                         capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
+    m = re.search(r"<title>ENT\|([^<]*)</title>", out)
+    if not m:
+        chk(f"entry probe at {w}px", False, "no title"); continue
+    before, after = m.group(1).split("|")
+    i1, l1, a1, o1, _ = before.split(";")
+    i2, l2, a2, _, b2 = after.split(";")
+    if expect == "desktop":
+        chk("while the entry runs, the desktop books are not on screen",
+            i1 == "1" and l1 == "0" and a1 == "none" and o1 == "0", before)
+        chk("the entry closing is what releases the desktop drop",
+            i2 == "0" and l2 == "1" and a2 == "drop", after)
+    else:
+        chk("on a phone the entry alone does not release the books",
+            i2 == "0" and l2 == "0" and a2 == "none", f"entry={i2} land={l2} anim={a2} shelf {b2}px from the fold")
 
 print(f"\n{ok} passed, {fail} failed")
 if fail:
