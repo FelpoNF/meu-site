@@ -648,8 +648,9 @@ setTimeout(function(){ document.title="ENT|"+first+"|"+e(); }, 9000);
 </script>"""
 ef = tmp / "entry.html"
 ef.write_text(html.replace("</body>", ENT + "</body>"), encoding="utf-8")
-for w, h, expect in ((1440, 900, "desktop"), (504, 800, "phone")):
-    out = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--virtual-time-budget=12000",
+for w, h, expect, extra in ((1440, 900, "desktop", ()), (504, 800, "phone", ()),
+                            (504, 800, "reduce", ("--force-prefers-reduced-motion",))):
+    out = subprocess.run([CHROME, "--headless=new", "--disable-gpu", *extra, "--virtual-time-budget=12000",
                           f"--window-size={w},{h}", "--dump-dom", ef.as_uri()],
                          capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
     m = re.search(r"<title>ENT\|([^<]*)</title>", out)
@@ -663,6 +664,9 @@ for w, h, expect in ((1440, 900, "desktop"), (504, 800, "phone")):
             i1 == "1" and l1 == "0" and a1 == "none" and o1 == "0", before)
         chk("the entry closing is what releases the desktop drop",
             i2 == "0" and l2 == "1" and a2 == "drop", after)
+    elif expect == "reduce":
+        chk("reduced motion: no curtain, no wait, the books simply sit there",
+            i1 == "0" and l1 == "1" and o1 == "1" and a1 == "none", before)
     else:
         chk("on a phone the entry alone does not release the books",
             i2 == "0" and l2 == "0" and a2 == "none", f"entry={i2} land={l2} anim={a2} shelf {b2}px from the fold")
